@@ -1,0 +1,1 @@
+sprint initializr: spring web, spring data jpa, h2 database, spring boot devtools

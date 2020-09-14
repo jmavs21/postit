@@ -1,0 +1,36 @@
+npx create-react-app web --template typescript
+npm i @chakra-ui/core @emotion/core @emotion/styled emotion-theming
+npm i --save react-router-dom
+npm i --save @types/react-router-dom
+npm i --save formik
+npm i --save axios
+? npm i --save react-icons
+
+index.tsx
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+App.tsx
+  <ThemeProvider theme={theme}>
+    <CSSReset />
+    <Switch>
+      <Route path="/" component={Register} />
+    </Switch>
+  </ThemeProvider>
+pages/Register.tsx
+  <Formik initialValues={{ username: '', password: '' }} onSubmit={(values) => {}}>
+    {({ isSubmitting }) => (
+      <Form>
+        <InputField name="username" label="Username" />
+        <InputField name="password" label="Password" type="password" />
+        <Button type="submit" isLoading={isSubmitting}>Register</Button>
+      </Form>
+    )}
+  </Formik>;
+components/InputField.tsx
+  <FormControl isInvalid={!!error}>
+    <FormLabel htmlFor={field.name}>{label}</FormLabel>
+    <Input {...field} {...props} id={field.name} placeholder={props.placeholder} />
+    {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
+  </FormControl>
+
