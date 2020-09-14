@@ -42,7 +42,6 @@ import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
@@ -112,9 +111,9 @@ class JwtRequestFilter : OncePerRequestFilter() {
       try {
         username = jwtTokenUtil.getUsernameFromToken(jwtToken)
       } catch (e: IllegalArgumentException) {
-        println("Unable to get JWT Token.")
+        logger.error("Unable to get JWT Token.")
       } catch (e: ExpiredJwtException) {
-        println("JWT Token has expired.")
+        logger.error("JWT Token has expired.")
       }
     }
     if (username != null && SecurityContextHolder.getContext().authentication == null) {
@@ -130,14 +129,12 @@ class JwtRequestFilter : OncePerRequestFilter() {
   }
 }
 
-
 @Component
 class JwtAuthenticationEntryPoint : AuthenticationEntryPoint {
   @Throws(IOException::class, ServletException::class)
   override fun commence(request: HttpServletRequest?, response: HttpServletResponse,
                         authException: AuthenticationException?) = response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
 }
-
 
 @Service
 class JwtUserDetailsService(private val userRepo: UserRepo) : UserDetailsService {
@@ -147,16 +144,11 @@ class JwtUserDetailsService(private val userRepo: UserRepo) : UserDetailsService
   @Throws(UsernameNotFoundException::class)
   override fun loadUserByUsername(email: String): UserDetails {
     return userRepo.findOneByEmail(email)
-        ?: throw DataRetrievalFailureException("No user found with username: $email")
-  }
-
-  fun getGeneratedToken(email: String): String {
-    return jwtTokenUtil.generateToken(loadUserByUsername(email) as User)
+        ?: throw DataRetrievalFailureException("No user found with email: $email")
   }
 }
 
-// TODO reduce to 1 hour: 1_000L * 60 * 60
-const val JWT_TOKEN_VALIDITY = 1_000L * 60 * 60 * 24 * 31 // 1 month
+const val JWT_TOKEN_VALIDITY = 1_000L * 60 * 60 * 24 * 31 // 1 month TODO: reduce to 1 hour: 1_000L * 60 * 60
 
 @Component
 class JwtTokenUtil {

@@ -1,6 +1,5 @@
 package com.postit.postitserver.web
 
-import com.postit.postitserver.conf.JwtUserDetailsService
 import com.postit.postitserver.model.User
 import com.postit.postitserver.service.PostService
 import com.postit.postitserver.service.UserService
@@ -16,10 +15,10 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/auth")
-class AuthController(private val userDetailsService: JwtUserDetailsService) {
+class AuthController(private var userService: UserService) {
 
   @PostMapping
-  fun create(@RequestBody authDtoReq: AuthDtoReq) = userDetailsService.getGeneratedToken((authDtoReq.email))
+  fun create(@RequestBody authDtoReq: AuthDtoReq) = userService.getGeneratedToken((authDtoReq.email))
 }
 
 @RestController
@@ -42,7 +41,7 @@ class UserController(private val userService: UserService) {
   @ResponseStatus(CREATED)
   fun create(@Valid @RequestBody newUser: UserDtoReq): ResponseEntity<UserDto> {
     val user = userService.create(newUser.toEntity())
-    val token = userService.getTokenFromEmail(user.email)
+    val token = userService.getGeneratedToken(user.email)
     val headers = HttpHeaders()
     headers.set("x-auth-token", token)
     headers.set("access-control-expose-headers", "x-auth-token")

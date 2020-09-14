@@ -8,6 +8,4 @@ interface UserRepo : CrudRepository<User, Long> {
   fun findOneByEmail(email: String): User?
 }
 
-interface PostRepo : CrudRepository<Post, Long> {
-  fun findOneByTitle(title: String): Post?
-}
+interface PostRepo : CrudRepository<Post, Long>
