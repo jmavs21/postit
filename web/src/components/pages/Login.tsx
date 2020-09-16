@@ -3,27 +3,33 @@ import { Formik, Form } from 'formik';
 import { Wrapper } from '../Wrapper';
 import { InputField } from '../InputField';
 import { Box, Button } from '@chakra-ui/core';
-import { register } from '../../services/userService';
+import { login, getLocalUser } from '../../services/authService';
+import { Redirect } from 'react-router-dom';
 
-interface RegisterProps {}
-
-export interface RegisterValues {
-  email: string;
-  password: string;
-  name: string;
+interface LoginProps {
+  location: any;
 }
 
-export const Register: React.FC<RegisterProps> = () => {
+export interface LoginValues {
+  email: string;
+  password: string;
+}
+
+export const Login: React.FC<LoginProps> = ({ location }) => {
+  if (getLocalUser()) return <Redirect to="/" />;
   return (
     <Wrapper variant="small">
       <Formik
-        initialValues={{ email: '', password: '', name: '' } as RegisterValues}
+        initialValues={{ email: '', password: '' } as LoginValues}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register(values);
+          const response = await login(values);
           if (response.errors) {
             setErrors(response.errors);
           } else {
-            window.location.href = '/';
+            console.log('location=', location.state);
+            window.location.href = location.state
+              ? location.state.from.pathname
+              : '/';
           }
         }}
       >
@@ -38,17 +44,14 @@ export const Register: React.FC<RegisterProps> = () => {
                 type="password"
               />
             </Box>
-            <Box mt={4}>
-              <InputField name="name" placeholder="name" label="Name" />
-            </Box>
             <Button
               mt={4}
               type="submit"
               isLoading={isSubmitting}
-              loadingText="Registering"
+              loadingText="Logining"
               variantColor="blue"
             >
-              Register
+              Login
             </Button>
           </Form>
         )}

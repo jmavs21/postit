@@ -1,5 +1,6 @@
 package com.postit.postitserver.conf
 
+import com.postit.postitserver.error.ErrorFieldException
 import com.postit.postitserver.model.User
 import com.postit.postitserver.repo.UserRepo
 import io.jsonwebtoken.Claims
@@ -9,8 +10,8 @@ import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
-import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -138,14 +139,9 @@ class JwtAuthenticationEntryPoint : AuthenticationEntryPoint {
 
 @Service
 class JwtUserDetailsService(private val userRepo: UserRepo) : UserDetailsService {
-  @Autowired
-  private lateinit var jwtTokenUtil: JwtTokenUtil
-
   @Throws(UsernameNotFoundException::class)
-  override fun loadUserByUsername(email: String): UserDetails {
-    return userRepo.findOneByEmail(email)
-        ?: throw DataRetrievalFailureException("No user found with email: $email")
-  }
+  override fun loadUserByUsername(email: String): UserDetails = userRepo.findOneByEmail(email)
+      ?: throw ErrorFieldException(hashMapOf("email" to "the email doesn't exists"), HttpStatus.BAD_REQUEST)
 }
 
 const val JWT_TOKEN_VALIDITY = 1_000L * 60 * 60 * 24 * 31 // 1 month TODO: reduce to 1 hour: 1_000L * 60 * 60
@@ -160,25 +156,21 @@ class JwtTokenUtil {
     return getAllClaimsFromToken(token).subject
   }
 
-  fun getExpirationDateFromToken(token: String): Date {
-    return getAllClaimsFromToken(token).expiration
+  fun generateToken(user: User): String {
+    val claims: HashMap<String, Any> = HashMap()
+    claims["id"] = user.id
+    claims["name"] = user.name
+    claims["email"] = user.email
+    return doGenerateToken(claims, user.email)
+  }
+
+  fun validateToken(token: String, userDetails: UserDetails): Boolean {
+    val username = getUsernameFromToken(token)
+    return username == userDetails.username && !isTokenExpired(token)
   }
 
   private fun getAllClaimsFromToken(token: String?): Claims {
     return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
-  }
-
-  private fun isTokenExpired(token: String): Boolean {
-    val expiration: Date = getExpirationDateFromToken(token)
-    return expiration.before(Date())
-  }
-
-  fun generateToken(user: User): String {
-    val claims: MutableMap<String, Any> = HashMap()
-    claims["_id"] = user.id
-    claims["name"] = user.username
-    claims["email"] = user.email
-    return doGenerateToken(claims, user.email)
   }
 
   private fun doGenerateToken(claims: Map<String, Any>, email: String): String {
@@ -187,8 +179,8 @@ class JwtTokenUtil {
         .signWith(SignatureAlgorithm.HS512, secret).compact()
   }
 
-  fun validateToken(token: String, userDetails: UserDetails): Boolean {
-    val username = getUsernameFromToken(token)
-    return username == userDetails.username && !isTokenExpired(token)
+  private fun isTokenExpired(token: String): Boolean {
+    val expiration: Date = getAllClaimsFromToken(token).expiration
+    return expiration.before(Date())
   }
 }

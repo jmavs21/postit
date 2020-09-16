@@ -4,7 +4,6 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.validation.FieldError
 import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -14,8 +13,14 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import javax.validation.ConstraintViolationException
 
+
 @ControllerAdvice
 class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
+
+  @ExceptionHandler(ErrorFieldException::class)
+  fun handleGlobalExceptions(ex: ErrorFieldException): ResponseEntity<Any> {
+    return ResponseEntity(ex.errors, ex.status)
+  }
 
   @ExceptionHandler(ResponseStatusException::class)
   fun handleGlobalExceptions(ex: ResponseStatusException): ResponseEntity<String> {
@@ -38,11 +43,9 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
   override fun handleMethodArgumentNotValid(ex: MethodArgumentNotValidException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
     val errors: MutableMap<String, String?> = HashMap()
-    ex.bindingResult.allErrors.forEach { error ->
-      val fieldName = (error as FieldError).field
-      val errorMessage = error.getDefaultMessage()
-      errors[fieldName] = errorMessage
+    for (error in ex.bindingResult.fieldErrors) {
+      errors[error.field] = error.defaultMessage
     }
-    return ResponseEntity("Error: $errors", HttpStatus.BAD_REQUEST)
+    return ResponseEntity(errors, HttpStatus.BAD_REQUEST)
   }
 }
