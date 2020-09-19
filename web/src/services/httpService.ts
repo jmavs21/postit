@@ -12,7 +12,7 @@ axios.interceptors.response.use(undefined, (error) => {
   return Promise.reject(error);
 });
 
-function setJwt(jwt: string) {
+function setJwtOnCommonHeaders(jwt: string) {
   axios.defaults.headers.common[header_token] = jwt;
 }
 
@@ -21,5 +21,5 @@ export default {
   post: axios.post,
   put: axios.put,
   delete: axios.delete,
-  setJwt,
+  setJwtOnCommonHeaders,
 };

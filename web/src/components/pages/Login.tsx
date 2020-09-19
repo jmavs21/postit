@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Formik, Form } from 'formik';
 import { Wrapper } from '../Wrapper';
 import { InputField } from '../InputField';
 import { Box, Button } from '@chakra-ui/core';
-import { login, getLocalUser } from '../../services/authService';
+import { login } from '../../services/authService';
 import { Redirect } from 'react-router-dom';
+import { UserContext } from '../../utils/UserContext';
 
 interface LoginProps {
   location: any;
@@ -16,7 +17,8 @@ export interface LoginValues {
 }
 
 export const Login: React.FC<LoginProps> = ({ location }) => {
-  if (getLocalUser()) return <Redirect to="/" />;
+  const { user, setUser } = useContext(UserContext);
+  if (user) return <Redirect to="/" />;
   return (
     <Wrapper variant="small">
       <Formik
@@ -26,7 +28,7 @@ export const Login: React.FC<LoginProps> = ({ location }) => {
           if (response.errors) {
             setErrors(response.errors);
           } else {
-            console.log('location=', location.state);
+            if (response.data && setUser) setUser(response.data);
             window.location.href = location.state
               ? location.state.from.pathname
               : '/';
@@ -35,7 +37,12 @@ export const Login: React.FC<LoginProps> = ({ location }) => {
       >
         {({ isSubmitting }) => (
           <Form>
-            <InputField name="email" placeholder="email" label="Email" />
+            <InputField
+              type="email"
+              name="email"
+              placeholder="email"
+              label="Email"
+            />
             <Box mt={4}>
               <InputField
                 name="password"
@@ -48,8 +55,7 @@ export const Login: React.FC<LoginProps> = ({ location }) => {
               mt={4}
               type="submit"
               isLoading={isSubmitting}
-              loadingText="Logining"
-              variantColor="blue"
+              loadingText="Login..."
             >
               Login
             </Button>

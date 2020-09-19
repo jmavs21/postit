@@ -1,29 +1,45 @@
-import http from './httpService';
 import { RegisterValues } from '../components/pages/Register';
 import { header_token } from '../utils/constants';
-import auth from './authService';
+import httpService from './httpService';
+import authService from './authService';
+import { ProfileValues } from '../components/pages/Profile';
 
-interface RegisterResponse {
+const usersApi = '/users';
+
+interface UserResponse {
   id: number;
   email: string;
-  password: string;
   name: string;
   createdat: string;
   udpatedat: string;
 }
 
 interface Response {
-  data?: RegisterResponse;
+  data?: UserResponse;
   errors?: RegisterValues;
 }
 
-export const register = async (user: RegisterValues) => {
+export const registerUser = async (user: RegisterValues) => {
   const response: Response = {};
   try {
-    const axiosResponse = await http.post<RegisterResponse>('/users', user);
+    const axiosResponse = await httpService.post<UserResponse>(usersApi, user);
     response.data = axiosResponse.data;
-    const token = axiosResponse.headers[header_token];
-    if (token) auth.storeJwt(token);
+    authService.storeJwt(axiosResponse.headers[header_token]);
+  } catch (ex) {
+    response.errors = ex.response.data;
+  }
+  return response;
+};
+
+export const updateUser = async (user: ProfileValues, userId: number) => {
+  const response: Response = {};
+  try {
+    const axiosResponse = await httpService.put<UserResponse>(
+      `${usersApi}/${userId}`,
+      user
+    );
+    response.data = axiosResponse.data;
+    authService.storeJwt(axiosResponse.headers[header_token]);
   } catch (ex) {
     response.errors = ex.response.data;
   }

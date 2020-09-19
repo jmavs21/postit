@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   theme,
   ThemeProvider,
@@ -13,19 +13,26 @@ import { Login } from './components/pages/Login';
 import { NavBar } from './components/NavBar';
 import { Logout } from './components/Logout';
 import { UserContext } from './utils/UserContext';
-import { getLocalUser } from './services/authService';
+import { getUserFromJwt } from './services/authService';
+import { Profile } from './components/pages/Profile';
+import { PostCreate } from './components/pages/PostCreate';
+import { RouteProtected } from './components/RouteProtected';
 
 const App: React.FC = () => {
+  const [user, setUser] = useState(() => getUserFromJwt());
+  const value = useMemo(() => ({ user, setUser }), [user, setUser]);
   return (
     <ThemeProvider theme={theme}>
       <ColorModeProvider>
         <CSSReset />
-        <UserContext.Provider value={getLocalUser()}>
+        <UserContext.Provider value={value}>
           <NavBar />
           <Switch>
             <Route path="/register" component={Register} />
             <Route path="/login" component={Login} />
             <Route path="/logout" component={Logout} />
+            <RouteProtected path="/profile" component={Profile} />
+            <RouteProtected path="/posts/:id" component={PostCreate} />
             <Route path="/posts" component={Posts} />
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" exact to="/posts" />

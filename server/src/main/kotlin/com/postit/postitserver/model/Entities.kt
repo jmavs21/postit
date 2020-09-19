@@ -4,14 +4,30 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
 import javax.persistence.*
+import java.io.Serializable
 
 @Entity
 @Table(name = "posts")
 class Post(
     @Column(nullable = false) var title: String,
+    @Column(nullable = false, columnDefinition = "TEXT")  var text: String,
+    @ManyToOne var user: User,
+    @Column(nullable = false) var points: Int = 0,
     @Column(nullable = false) var createdat: LocalDateTime = LocalDateTime.now(),
     @Column(nullable = false) var updatedat: LocalDateTime = LocalDateTime.now(),
     @Column(nullable = false, updatable = false) @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0)
+
+@Embeddable
+data class UserPostVote(var userId: Long, var postId: Long) : Serializable
+
+@Entity
+@Table(name = "votes")
+class Vote(
+    @Column(nullable = false) var value: Int = 0,
+    @ManyToOne @MapsId("userId") @JoinColumn(name = "user_id") var user: User,
+    @ManyToOne @MapsId("postId") @JoinColumn(name = "post_id") var post: Post,
+    @EmbeddedId val id: UserPostVote
+)
 
 @Entity
 @Table(name = "users")

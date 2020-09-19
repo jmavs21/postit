@@ -1,3 +1,4 @@
+-- IMPORTS --
 npx create-react-app web --template typescript
 npm i @chakra-ui/core @emotion/core @emotion/styled emotion-theming
 npm i --save react-router-dom
@@ -6,12 +7,16 @@ npm i --save formik
 npm i --save axios
 npm i --save jwt-decode
 npm i --save @types/jwt-decode
+npm i --save immer
 ? npm i --save react-icons
 
+-- INDEX SETUP --
 index.tsx
   <BrowserRouter>
     <App />
   </BrowserRouter>
+
+--- APP SETUP ----
 App.tsx
   <ThemeProvider theme={theme}>
     <CSSReset />
@@ -19,6 +24,8 @@ App.tsx
       <Route path="/" component={Register} />
     </Switch>
   </ThemeProvider>
+
+--- FORMIK ----
 pages/Register.tsx
   <Formik initialValues={{ email: '', password: '' }} onSubmit={(values) => {}}>
     {({ isSubmitting }) => (
@@ -36,3 +43,29 @@ components/InputField.tsx
     {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
   </FormControl>
 
+--- MANUAL UPDATE STATE ----
+const postsResCopy = JSON.parse(JSON.stringify(postsRes));
+    postsResCopy.posts.push(...response.data.posts);
+    setPostsRes({
+      posts: postsResCopy.posts,
+      hasMore: response.data.hasMore,
+    });
+
+const updatePostWithoutImmer = (
+    postId: number,
+    poinst: number,
+    voteValue: number
+  ) => {
+    const postsResCopy: PostsRes = JSON.parse(JSON.stringify(postsRes));
+    const postCopy: PostSnippet | undefined = postsResCopy.posts.find(
+      (p) => p.id === postId
+    );
+    if (postCopy === undefined) return;
+    postCopy.points = poinst;
+    postCopy.voteValue = voteValue;
+
+    setPostsRes({
+      posts: postsResCopy.posts,
+      hasMore: postsResCopy.hasMore,
+    });
+  };
