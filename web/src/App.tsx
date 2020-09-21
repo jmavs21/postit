@@ -16,7 +16,8 @@ import { UserContext } from './utils/UserContext';
 import { getUserFromJwt } from './services/authService';
 import { Profile } from './components/pages/Profile';
 import { PostCreate } from './components/pages/PostCreate';
-import { RouteProtected } from './components/RouteProtected';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { PostView } from './components/pages/PostView';
 
 const App: React.FC = () => {
   const [user, setUser] = useState(() => getUserFromJwt());
@@ -31,8 +32,9 @@ const App: React.FC = () => {
             <Route path="/register" component={Register} />
             <Route path="/login" component={Login} />
             <Route path="/logout" component={Logout} />
-            <RouteProtected path="/profile" component={Profile} />
-            <RouteProtected path="/posts/:id" component={PostCreate} />
+            <ProtectedRoute path="/profile" component={Profile} />
+            <ProtectedRoute path="/posts/new" component={PostCreate} />
+            <Route path="/posts/:id" component={PostView} />
             <Route path="/posts" component={Posts} />
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" exact to="/posts" />

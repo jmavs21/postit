@@ -7,8 +7,8 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/core';
-import produce from 'immer';
 import React, { useContext, useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { getPosts, PostsRes } from '../../services/postService';
 import { UserContext } from '../../utils/UserContext';
 import { Votes } from '../Votes';
@@ -32,13 +32,12 @@ export const Posts: React.FC<PostsProps> = () => {
         : ''
     );
     if (response.data) {
-      const newPostsRes = produce(postsState, (draft) => {
-        if (response.data) {
-          draft.posts.push(...response.data.posts);
-          draft.hasMore = response.data.hasMore;
-        }
+      const postsResCopy = JSON.parse(JSON.stringify(postsState));
+      postsResCopy.posts.push(...response.data.posts);
+      setPostsState({
+        posts: postsResCopy.posts,
+        hasMore: response.data.hasMore,
       });
-      setPostsState(newPostsRes);
     }
     setIsLoading(false);
   };
@@ -46,22 +45,6 @@ export const Posts: React.FC<PostsProps> = () => {
   useEffect(() => {
     fetchData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const updatePostVote = (
-    postId: number,
-    points: number,
-    voteValue: number
-  ) => {
-    const newPostsRes = produce(postsState, (draft) => {
-      const idx = draft.posts.findIndex((p) => p.id === postId);
-      if (idx > -1) {
-        const post = draft.posts[idx];
-        post.points = points;
-        post.voteValue = voteValue;
-      }
-    });
-    setPostsState(newPostsRes);
-  };
 
   return (
     <Wrapper>
@@ -78,14 +61,11 @@ export const Posts: React.FC<PostsProps> = () => {
           <Stack spacing={8}>
             {postsState.posts.map((p) => (
               <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
-                <Votes
-                  key={p.id}
-                  post={p}
-                  updatePostVote={updatePostVote}
-                  isUser={user !== null}
-                />
+                <Votes key={p.id} post={p} isUser={user !== null} />
                 <Box>
-                  <Heading fontSize="xl">{p.title}</Heading>
+                  <Heading fontSize="xl">
+                    <NavLink to={'/posts/' + p.id}>{p.title}</NavLink>
+                  </Heading>
                   <Text>{p.user.name}</Text>
                   <Text mt={4}>{p.textSnippet}...</Text>
                 </Box>

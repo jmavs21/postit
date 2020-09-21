@@ -69,3 +69,34 @@ const updatePostWithoutImmer = (
       hasMore: postsResCopy.hasMore,
     });
   };
+
+--- IMMER UPDATE STATE ----
+ const newPostsRes = produce(postsState, (draft) => {
+        if (response.data) {
+          draft.posts.push(...response.data.posts);
+          draft.hasMore = response.data.hasMore;
+        }
+      });
+      setPostsState(newPostsRes);
+
+const updatePostVote = (
+    postId: number,
+    points: number,
+    voteValue: number
+  ) => {
+    const newPostsRes = produce(postsState, (draft) => {
+      const idx = draft.posts.findIndex((p) => p.id === postId);
+      if (idx > -1) {
+        const post = draft.posts[idx];
+        post.points = points;
+        post.voteValue = voteValue;
+      }
+    });
+
+    console.log('before=', postsState);
+    console.log('after =', newPostsRes);
+
+    setPostsState(newPostsRes);
+  };
+
+updatePostVote(post.id, response.data, isUpVote ? 1 : -1);
