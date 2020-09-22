@@ -24,27 +24,37 @@ export const Posts: React.FC<PostsProps> = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchData = async () => {
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      const { data } = await getPosts('');
+      if (data) {
+        setPostsState({
+          posts: data.posts,
+          hasMore: data.hasMore,
+        });
+      }
+      setIsLoading(false);
+    })();
+  }, []);
+
+  const loadMore = async () => {
     setIsLoading(true);
-    const response = await getPosts(
+    const { data } = await getPosts(
       postsState.posts.length !== 0
         ? postsState.posts[postsState.posts.length - 1].createdat
         : ''
     );
-    if (response.data) {
+    if (data) {
       const postsResCopy = JSON.parse(JSON.stringify(postsState));
-      postsResCopy.posts.push(...response.data.posts);
+      postsResCopy.posts.push(...data.posts);
       setPostsState({
         posts: postsResCopy.posts,
-        hasMore: response.data.hasMore,
+        hasMore: data.hasMore,
       });
     }
     setIsLoading(false);
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Wrapper>
@@ -74,7 +84,7 @@ export const Posts: React.FC<PostsProps> = () => {
           </Stack>
           <Flex>
             <Button
-              onClick={fetchData}
+              onClick={loadMore}
               isDisabled={!postsState.hasMore}
               m="auto"
               mt={8}

@@ -4,9 +4,9 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import java.io.Serializable
 import java.time.LocalDateTime
 import javax.persistence.*
-import java.io.Serializable
 
 @Entity
 @Table(name = "posts")
@@ -54,6 +54,10 @@ class User : UserDetails {
 
   @Column(nullable = false)
   var updatedat: LocalDateTime = LocalDateTime.now()
+
+  @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+  @JoinColumn(name= "user_id")
+  private val posts: Set<Post> = hashSetOf()
 
   override fun getAuthorities(): Collection<GrantedAuthority?>? {
     return ArrayList()

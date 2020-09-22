@@ -100,3 +100,5 @@ const updatePostVote = (
   };
 
 updatePostVote(post.id, response.data, isUpVote ? 1 : -1);
+
+// eslint-disable-line react-hooks/exhaustive-deps
