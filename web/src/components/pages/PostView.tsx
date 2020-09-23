@@ -4,8 +4,6 @@ import {
   Box,
   Heading,
   Text,
-  Alert,
-  AlertIcon,
   IconButton,
   useToast,
   Button,
@@ -24,6 +22,7 @@ import { InputField } from '../InputField';
 import { Wrapper } from '../Wrapper';
 import { PostCreateValues } from './PostCreate';
 import { History } from 'history';
+import { LoadingProgress } from '../LoadingProgress';
 
 interface MatchParams {
   id: string;
@@ -37,20 +36,25 @@ interface PostViewProps extends RouteComponentProps<MatchParams> {
 export const PostView: React.FC<PostViewProps> = ({ history, ...props }) => {
   const { user } = useContext(UserContext);
   const [post, setPost] = useState<Post>({} as Post);
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
   const postId = props.match.params.id;
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       const response = await getPostById(postId);
       if (response.data) setPost(response.data);
+      setIsLoading(false);
     };
     fetchData();
   }, [postId]);
 
   const deletePost = async (postId: number) => {
+    setIsLoading(true);
     const isOk = await deletePostById(post.id);
+    setIsLoading(false);
     if (isOk) {
       window.location.href = '/';
     } else {
@@ -66,11 +70,8 @@ export const PostView: React.FC<PostViewProps> = ({ history, ...props }) => {
 
   return (
     <Wrapper>
-      {!post.user ? (
-        <Alert status="error">
-          <AlertIcon />
-          There was an error fetching the post.
-        </Alert>
+      {isLoading || !post.user ? (
+        <LoadingProgress />
       ) : user != null && user.id === post.user.id ? (
         <Box p={5} shadow="md" borderWidth="1px">
           <Flex>
@@ -79,8 +80,9 @@ export const PostView: React.FC<PostViewProps> = ({ history, ...props }) => {
               size="xs"
               variantColor="red"
               aria-label="Delete post"
-              onClick={async () => deletePost(post.id)}
+              onClick={() => deletePost(post.id)}
               icon="delete"
+              isLoading={isLoading}
             />
           </Flex>
           <Box flex={1}>

@@ -82,7 +82,7 @@ class UserController(
 class PostController(private val postService: PostService) {
   @GetMapping("/")
   fun findAll(@RequestParam cursor: String, @AuthenticationPrincipal user: User?): PostsDto {
-    val posts = postService.findAll(cursor, user)
+    val posts = postService.findAll(cursor, user, 11)
     return PostsDto(posts.take(10), posts.size == 11)
   }
 

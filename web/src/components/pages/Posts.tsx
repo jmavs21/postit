@@ -1,16 +1,9 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Flex,
-  Heading,
-  Stack,
-  Text,
-} from '@chakra-ui/core';
+import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { getPosts, PostsRes } from '../../services/postService';
 import { UserContext } from '../../utils/UserContext';
+import { LoadingProgress } from '../LoadingProgress';
 import { Votes } from '../Votes';
 import { Wrapper } from '../Wrapper';
 
@@ -59,13 +52,7 @@ export const Posts: React.FC<PostsProps> = () => {
   return (
     <Wrapper>
       {isLoading && postsState.posts.length === 0 ? (
-        <Flex>
-          <CircularProgress
-            m="auto"
-            isIndeterminate
-            color="green"
-          ></CircularProgress>
-        </Flex>
+        <LoadingProgress />
       ) : (
         <>
           <Stack spacing={8}>
