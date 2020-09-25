@@ -13,8 +13,7 @@ import javax.persistence.*
 class Post(
     @Column(nullable = false) var title: String,
     @Column(nullable = false, columnDefinition = "TEXT")  var text: String,
-    @ManyToOne /*(fetch = FetchType.LAZY)*/ @OnDelete(action = OnDeleteAction.CASCADE) var user: User,
-    // @Column(name="user_id", insertable = false, updatable = false) var user_id: Long = 0,
+    @ManyToOne @OnDelete(action = OnDeleteAction.CASCADE) var user: User,
     @Column(nullable = false) var points: Int = 0,
     @Column(nullable = false) var createdat: LocalDateTime = LocalDateTime.now(),
     @Column(nullable = false) var updatedat: LocalDateTime = LocalDateTime.now(),
@@ -55,10 +54,6 @@ class User : UserDetails {
 
   @Column(nullable = false)
   var updatedat: LocalDateTime = LocalDateTime.now()
-
-//  @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-//  @JoinColumn(name= "user_id")
-//  private val posts: Set<Post> = hashSetOf()
 
   override fun getAuthorities(): Collection<GrantedAuthority?>? {
     return ArrayList()

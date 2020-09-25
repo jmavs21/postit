@@ -1,11 +1,11 @@
-package com.postit.api.web
+package com.posts.api.web
 
-import com.postit.api.conf.JwtTokenUtil
-import com.postit.api.error.ErrorFieldException
-import com.postit.api.model.User
-import com.postit.api.service.PostService
-import com.postit.api.service.UserService
-import com.postit.api.service.VoteService
+import com.posts.api.conf.JwtTokenUtil
+import com.posts.api.error.ErrorFieldException
+import com.posts.api.model.User
+import com.posts.api.service.PostService
+import com.posts.api.service.UserService
+import com.posts.api.service.VoteService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED
@@ -37,6 +37,7 @@ class AuthController(
 class UserController(
     private val userService: UserService,
     private val jwtTokenUtil: JwtTokenUtil) {
+
   @GetMapping
   fun findAll(): Iterable<UserDto> = userService.findAll().map { it.toDto() }
 
@@ -77,13 +78,16 @@ class UserController(
   }
 }
 
+const val POSTS_LIMIT = 20
+
 @RestController
 @RequestMapping("/api/posts")
 class PostController(private val postService: PostService) {
+
   @GetMapping("/")
-  fun findAll(@RequestParam cursor: String, @AuthenticationPrincipal user: User?): PostsDto {
-    val posts = postService.findAll(cursor, user, 11)
-    return PostsDto(posts.take(10), posts.size == 11)
+  fun findAll(@RequestParam cursor: String, @RequestParam search: String, @AuthenticationPrincipal user: User?): PostsDto {
+    val posts = postService.findAll(cursor, search, user, POSTS_LIMIT + 1)
+    return PostsDto(posts.take(POSTS_LIMIT), posts.size == POSTS_LIMIT + 1)
   }
 
   @GetMapping("/{id}")
@@ -104,6 +108,7 @@ class PostController(private val postService: PostService) {
 @RestController
 @RequestMapping("/api/votes")
 class VoteController(private val voteService: VoteService) {
+
   @PostMapping
   @ResponseStatus(CREATED)
   fun create(@Valid @RequestBody newVote: VoteCreateDtoReq, auth: Authentication): Int = voteService.create(newVote.isUpVote, newVote.postId, auth.principal as User)

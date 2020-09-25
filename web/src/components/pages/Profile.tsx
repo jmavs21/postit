@@ -17,13 +17,13 @@ export interface ProfileValues {
 export const Profile: React.FC<ProfileProps> = ({ location }) => {
   const { user, setUser } = useContext(UserContext);
   if (!user) {
-    console.log('error with user from context');
+    console.log('Error with user from context');
     return null;
   }
   return (
     <Wrapper variant="small">
       <Formik
-        initialValues={{ name: '' } as ProfileValues}
+        initialValues={{ name: user.name } as ProfileValues}
         onSubmit={async (values, { setErrors }) => {
           const response = await updateUser(values, user.id);
           if (response.errors) {

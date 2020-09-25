@@ -6,22 +6,22 @@ import { Wrapper } from '../Wrapper';
 import { History } from 'history';
 import { createPost } from '../../services/postService';
 
-interface PostCreateProps {
+interface CreatePostProps {
   history: History;
 }
 
-export interface PostCreateValues {
+export interface CreatePostValues {
   title: string;
   text: string;
 }
 
-export const PostCreate: React.FC<PostCreateProps> = ({ history }) => {
+export const CreatePost: React.FC<CreatePostProps> = ({ history }) => {
   return (
     <Wrapper>
       <Flex p={5} shadow="md" borderWidth="1px">
         <Box flex={1}>
           <Formik
-            initialValues={{ title: '', text: '' } as PostCreateValues}
+            initialValues={{ title: '', text: '' } as CreatePostValues}
             onSubmit={async (values, { setErrors }) => {
               const response = await createPost(values);
               if (response.errors) {

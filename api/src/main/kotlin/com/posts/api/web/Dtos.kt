@@ -1,7 +1,7 @@
-package com.postit.api.web
+package com.posts.api.web
 
-import com.postit.api.model.Post
-import com.postit.api.model.User
+import com.posts.api.model.Post
+import com.posts.api.model.User
 import java.time.LocalDateTime
 import javax.validation.constraints.Size
 
@@ -74,6 +74,7 @@ data class PostDto(
     var id: Long?)
 
 fun Post.toDto() = PostDto(title, text, points, user.toDto(), createdat, updatedat, id)
+
 fun Post.toSnippetDto() = PostSnippetDto(title, text.substring(0, 200.coerceAtMost(text.length)), points, 0, user.toDto(), createdat, updatedat, id)
 
 data class VoteCreateDtoReq(

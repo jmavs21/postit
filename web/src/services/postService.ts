@@ -1,4 +1,4 @@
-import { PostCreateValues } from '../components/pages/PostCreate';
+import { CreatePostValues } from '../components/pages/CreatePost';
 import { User } from './authService';
 import httpService from './httpService';
 
@@ -31,14 +31,14 @@ export interface Post {
   udpatedat: string;
 }
 
-export const getPosts = async (cursor: string) => {
+export const getPosts = async (cursor: string, search: string) => {
   const response: {
     data?: PostsRes;
     errors?: any;
   } = {};
   try {
     const axiosResponse = await httpService.get<PostsRes>(
-      `${postsApi}/?cursor=${cursor}`
+      `${postsApi}/?cursor=${cursor}&search=${search}`
     );
     response.data = axiosResponse.data;
   } catch (ex) {
@@ -48,7 +48,7 @@ export const getPosts = async (cursor: string) => {
   return response;
 };
 
-export const createPost = async (post: PostCreateValues) => {
+export const createPost = async (post: CreatePostValues) => {
   const response: { data?: any; errors?: any } = {};
   try {
     const axiosReponse = await httpService.post(postsApi, post);
@@ -84,7 +84,7 @@ export const deletePostById = async (postId: number) => {
   return true;
 };
 
-export const updatePost = async (postId: number, post: PostCreateValues) => {
+export const updatePost = async (postId: number, post: CreatePostValues) => {
   const response: { data?: any; errors?: any } = {};
   try {
     const axiosReponse = await httpService.put<Post>(

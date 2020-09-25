@@ -1,7 +1,9 @@
-import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/core';
+import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Waypoint } from 'react-waypoint';
 import { getPosts, PostsRes } from '../../services/postService';
+import { SEARCH_QUERY } from '../../utils/constants';
 import { UserContext } from '../../utils/UserContext';
 import { LoadingProgress } from '../LoadingProgress';
 import { Votes } from '../Votes';
@@ -9,18 +11,24 @@ import { Wrapper } from '../Wrapper';
 
 interface PostsProps {}
 
+const getSearchQuery = (search: string) => {
+  const query = new URLSearchParams(search).get(SEARCH_QUERY);
+  return query ? query : '';
+};
+
 export const Posts: React.FC<PostsProps> = () => {
   const { user } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const { search } = useLocation();
   const [postsState, setPostsState] = useState<PostsRes>({
     posts: [],
     hasMore: true,
   });
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const { data } = await getPosts('');
+      const { data } = await getPosts('', getSearchQuery(search));
       if (data) {
         setPostsState({
           posts: data.posts,
@@ -29,14 +37,15 @@ export const Posts: React.FC<PostsProps> = () => {
       }
       setIsLoading(false);
     })();
-  }, []);
+  }, [search]);
 
   const loadMore = async () => {
     setIsLoading(true);
     const { data } = await getPosts(
       postsState.posts.length !== 0
         ? postsState.posts[postsState.posts.length - 1].createdat
-        : ''
+        : '',
+      getSearchQuery(search)
     );
     if (data) {
       const postsResCopy = JSON.parse(JSON.stringify(postsState));
@@ -63,24 +72,18 @@ export const Posts: React.FC<PostsProps> = () => {
                   <Heading fontSize="xl">
                     <NavLink to={'/posts/' + p.id}>{p.title}</NavLink>
                   </Heading>
-                  <Text>{p.user.name}</Text>
+                  <Text as="i">{p.user.name}</Text>
                   <Text mt={4}>{p.textSnippet}...</Text>
                 </Box>
               </Flex>
             ))}
+            <>
+              {!isLoading && postsState.hasMore && (
+                <Waypoint onEnter={loadMore} />
+              )}
+              {postsState.hasMore && <LoadingProgress />}
+            </>
           </Stack>
-          <Flex>
-            <Button
-              onClick={loadMore}
-              isDisabled={!postsState.hasMore}
-              m="auto"
-              mt={8}
-              isLoading={isLoading}
-              loadingText="Loading"
-            >
-              Load more
-            </Button>
-          </Flex>
         </>
       )}
     </Wrapper>

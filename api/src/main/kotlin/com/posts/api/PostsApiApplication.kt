@@ -1,11 +1,11 @@
-package com.postit.api
+package com.posts.api
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class PostitApiApplication
+class PostsApiApplication
 
 fun main(args: Array<String>) {
-	runApplication<PostitApiApplication>(*args)
+	runApplication<PostsApiApplication>(*args)
 }

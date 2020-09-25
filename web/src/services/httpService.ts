@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { header_token } from '../utils/constants';
+import { HEADER_TOKEN } from '../utils/constants';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -13,7 +13,7 @@ axios.interceptors.response.use(undefined, (error) => {
 });
 
 function setJwtOnCommonHeaders(jwt: string) {
-  axios.defaults.headers.common[header_token] = jwt;
+  axios.defaults.headers.common[HEADER_TOKEN] = jwt;
 }
 
 export default {

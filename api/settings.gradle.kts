@@ -1,1 +1,1 @@
-rootProject.name = "postit-api"
+rootProject.name = "posts-api"

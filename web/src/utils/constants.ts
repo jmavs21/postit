@@ -1,1 +1,2 @@
-export const header_token = 'x-auth-token';
+export const HEADER_TOKEN = 'x-auth-token';
+export const SEARCH_QUERY = 'search';

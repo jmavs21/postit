@@ -1,15 +1,15 @@
-package com.postit.api.service
+package com.posts.api.service
 
-import com.postit.api.error.ErrorFieldException
-import com.postit.api.model.Post
-import com.postit.api.model.User
-import com.postit.api.model.UserPostVote
-import com.postit.api.model.Vote
-import com.postit.api.repo.PostRepo
-import com.postit.api.repo.UserRepo
-import com.postit.api.repo.VoteRepo
-import com.postit.api.web.PostSnippetDto
-import com.postit.api.web.toSnippetDto
+import com.posts.api.error.ErrorFieldException
+import com.posts.api.model.Post
+import com.posts.api.model.User
+import com.posts.api.model.UserPostVote
+import com.posts.api.model.Vote
+import com.posts.api.repo.PostRepo
+import com.posts.api.repo.UserRepo
+import com.posts.api.repo.VoteRepo
+import com.posts.api.web.PostSnippetDto
+import com.posts.api.web.toSnippetDto
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -54,8 +54,8 @@ class UserService(
 class PostService(private val postRepo: PostRepo, private val voteRepo: VoteRepo) {
 
   @Transactional
-  fun findAll(createdat: String, authUser: Any?, limit: Int): List<PostSnippetDto> {
-    val posts = postRepo.findPostsFeed(getDateFromCursor(createdat), PageRequest.of(0, limit))
+  fun findAll(createdat: String, search: String, authUser: Any?, limit: Int): List<PostSnippetDto> {
+    val posts = if (search.isBlank()) postRepo.findPostsFeed(getDateFromCursor(createdat), PageRequest.of(0, limit)) else postRepo.findPostsFeedSearch(getDateFromCursor(createdat), "%$search%", PageRequest.of(0, limit))
     if (authUser == null) return posts.toList().map { it.toSnippetDto() }
     val user = authUser as User
     val votes = voteRepo.findAllByUserId(user.id)
@@ -63,9 +63,9 @@ class PostService(private val postRepo: PostRepo, private val voteRepo: VoteRepo
     votes.forEach { mapOfVotes[it.post.id] = it.value }
     return posts.map { post ->
       val postDto = post.toSnippetDto()
-        if (postDto.id in mapOfVotes) {
-          postDto.voteValue = mapOfVotes.getValue(postDto.id)
-        }
+      if (postDto.id in mapOfVotes) {
+        postDto.voteValue = mapOfVotes.getValue(postDto.id)
+      }
       postDto
     }
   }

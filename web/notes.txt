@@ -1,14 +1,14 @@
 -- IMPORTS --
 npx create-react-app web --template typescript
 npm i @chakra-ui/core @emotion/core @emotion/styled emotion-theming
-npm i --save react-router-dom
-npm i --save @types/react-router-dom
-npm i --save formik
-npm i --save axios
-npm i --save jwt-decode
-npm i --save @types/jwt-decode
-npm i --save immer
-? npm i --save react-icons
+npm i react-router-dom --save
+npm i @types/react-router-dom --save
+npm i formik --save
+npm i axios --save
+npm i jwt-decode --save
+npm i @types/jwt-decode --save
+npm i immer --save 
+npm i react-waypoint --save
 
 -- INDEX SETUP --
 index.tsx

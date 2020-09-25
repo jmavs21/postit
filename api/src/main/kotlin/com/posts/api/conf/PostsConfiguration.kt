@@ -1,4 +1,4 @@
-package com.postit.api.conf
+package com.posts.api.conf
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

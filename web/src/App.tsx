@@ -15,7 +15,7 @@ import { Logout } from './components/Logout';
 import { UserContext } from './utils/UserContext';
 import { getUserFromJwt } from './services/authService';
 import { Profile } from './components/pages/Profile';
-import { PostCreate } from './components/pages/PostCreate';
+import { CreatePost } from './components/pages/CreatePost';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PostView } from './components/pages/PostView';
 
@@ -33,7 +33,7 @@ const App: React.FC = () => {
             <Route path="/login" component={Login} />
             <Route path="/logout" component={Logout} />
             <ProtectedRoute path="/profile" component={Profile} />
-            <ProtectedRoute path="/posts/new" component={PostCreate} />
+            <ProtectedRoute path="/posts/new" component={CreatePost} />
             <Route path="/posts/:id" component={PostView} />
             <Route path="/posts" component={Posts} />
             <Route path="/not-found" component={NotFound} />

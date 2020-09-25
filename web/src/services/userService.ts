@@ -1,5 +1,5 @@
 import { RegisterValues } from '../components/pages/Register';
-import { header_token } from '../utils/constants';
+import { HEADER_TOKEN } from '../utils/constants';
 import httpService from './httpService';
 import authService from './authService';
 import { ProfileValues } from '../components/pages/Profile';
@@ -24,7 +24,7 @@ export const registerUser = async (user: RegisterValues) => {
   try {
     const axiosResponse = await httpService.post<UserResponse>(usersApi, user);
     response.data = axiosResponse.data;
-    authService.storeJwt(axiosResponse.headers[header_token]);
+    authService.storeJwt(axiosResponse.headers[HEADER_TOKEN]);
   } catch (ex) {
     response.errors = ex.response.data;
   }
@@ -39,7 +39,7 @@ export const updateUser = async (user: ProfileValues, userId: number) => {
       user
     );
     response.data = axiosResponse.data;
-    authService.storeJwt(axiosResponse.headers[header_token]);
+    authService.storeJwt(axiosResponse.headers[HEADER_TOKEN]);
   } catch (ex) {
     response.errors = ex.response.data;
   }

@@ -1,21 +1,14 @@
-import {
-  Text,
-  Flex,
-  useColorMode,
-  IconButton,
-  Button,
-  Heading,
-  Box,
-} from '@chakra-ui/core';
-import { Formik, Form } from 'formik';
+import { Flex, Heading, IconButton, Text, useColorMode } from '@chakra-ui/core';
+import { Form, Formik } from 'formik';
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+import { SEARCH_QUERY } from '../utils/constants';
 import { UserContext } from '../utils/UserContext';
-import { InputField } from './InputField';
+import { SearchField } from './SearchField';
 
 interface NavBarProps {}
 
-export interface ProfileValues {
+export interface SearchValues {
   searchText: string;
 }
 
@@ -25,88 +18,79 @@ export const NavBar: React.FC<NavBarProps> = () => {
   return (
     <Flex
       bg="LightCoral"
+      p={1}
       zIndex={1}
       position="sticky"
       top={0}
-      alignItems="center"
+      justify="center"
+      align="center"
     >
-      <Flex ml={8}>
-        <NavLink to="/">
-          <Heading>POST IT</Heading>
-        </NavLink>
-      </Flex>
-      <Flex ml={8}>
-        <Button size="sm">
-          <NavLink to="/posts/new">Create Post</NavLink>
-        </Button>
-        <Box>
+      <Flex width={800} align="center">
+        <Flex mr={4}>
+          <NavLink to="/">
+            <Heading size="lg">POSTS</Heading>
+          </NavLink>
+          <NavLink to="/posts/new">
+            <IconButton
+              icon="edit"
+              size="xs"
+              ml={4}
+              isRound={true}
+              aria-label="Create post"
+            />
+          </NavLink>
+        </Flex>
+        <Flex flex={1}>
           <Formik
-            initialValues={{ searchText: '' } as ProfileValues}
+            initialValues={{ searchText: '' } as SearchValues}
             onSubmit={async (values, { setErrors }) => {
-              console.log('values', values);
-              // const response = await updatePost(post.id, values);
-              // if (response.errors) {
-              //   setErrors(response.errors);
-              // } else {
-              //   history.push('/posts');
-              // }
+              window.location.href = `/posts?${SEARCH_QUERY}=${values.searchText}`;
             }}
           >
-            {({ isSubmitting }) => (
-              <Form>
-                <Flex>
-                  <InputField name="search" placeholder="search..." />
-                  <IconButton
-                    size="xs"
-                    type="submit"
-                    icon="search-2"
-                    isLoading={isSubmitting}
-                    onClick={() => {
-                      console.log('clicked.');
-                    }}
-                    aria-label="serach text"
-                  />
-                </Flex>
+            {() => (
+              <Form style={{ width: '100%' }}>
+                <SearchField name="searchText" placeholder="Search..." />
               </Form>
             )}
           </Formik>
-        </Box>
-      </Flex>
-      <Flex ml="auto">
-        <IconButton
-          size="xs"
-          mr={8}
-          aria-label={`change to ${colorMode} mode`}
-          onClick={toggleColorMode}
-          icon={colorMode === 'light' ? 'sun' : 'moon'}
-        />
-        {!user && (
-          <>
-            <Text mr={4}>
-              <NavLink to="/login">Login</NavLink>
-            </Text>
-            <Text mr={8}>
-              <NavLink to="/register">Register</NavLink>
-            </Text>
-          </>
-        )}
-        {user && (
-          <>
-            <Text mr={4}>
-              <NavLink to="/profile">{user.name}</NavLink>
-            </Text>
-            <Text mr={8}>
-              <NavLink
-                to="/logout"
-                onClick={() => {
-                  if (setUser != null) setUser(null);
-                }}
-              >
-                Logout
-              </NavLink>
-            </Text>
-          </>
-        )}
+        </Flex>
+        <Flex ml={4} align="center">
+          <IconButton
+            icon={colorMode === 'light' ? 'sun' : 'moon'}
+            size="xs"
+            mr={2}
+            isRound={true}
+            aria-label={`change to ${colorMode} mode`}
+            onClick={toggleColorMode}
+          />
+          {!user && (
+            <>
+              <Text mr={2}>
+                <NavLink to="/login">Login</NavLink>
+              </Text>
+              <Text>
+                <NavLink to="/register">Register</NavLink>
+              </Text>
+            </>
+          )}
+          {user && (
+            <>
+              <Text as="i" mr={2}>
+                <NavLink to="/profile">{user.name}</NavLink>
+              </Text>
+              <Text>
+                <NavLink
+                  to="/logout"
+                  onClick={() => {
+                    if (setUser != null) setUser(null);
+                  }}
+                >
+                  Logout
+                </NavLink>
+              </Text>
+            </>
+          )}
+        </Flex>
       </Flex>
     </Flex>
   );

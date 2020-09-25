@@ -2,7 +2,6 @@ import { Flex, IconButton, Text } from '@chakra-ui/core';
 import React, { useState } from 'react';
 import { PostSnippet } from '../services/postService';
 import { createVote } from '../services/voteService';
-import { sleep } from '../utils/sleep';
 
 interface VotesProps {
   post: PostSnippet;
@@ -15,7 +14,6 @@ export const Votes: React.FC<VotesProps> = ({ post, isUser }) => {
   const [isVoteLoading, setIsVoteLoading] = useState<loadingStates>('no');
   const callVote = async (postId: number, isUpVote: boolean, load: string) => {
     setIsVoteLoading(load as loadingStates);
-    await sleep(1000);
     const response = await createVote({ postId, isUpVote });
     if (response.data != null) {
       post.points = response.data;

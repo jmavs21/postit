@@ -20,7 +20,7 @@ import {
 import { UserContext } from '../../utils/UserContext';
 import { InputField } from '../InputField';
 import { Wrapper } from '../Wrapper';
-import { PostCreateValues } from './PostCreate';
+import { CreatePostValues } from './CreatePost';
 import { History } from 'history';
 import { LoadingProgress } from '../LoadingProgress';
 
@@ -88,7 +88,7 @@ export const PostView: React.FC<PostViewProps> = ({ history, ...props }) => {
           <Box flex={1}>
             <Formik
               initialValues={
-                { title: post.title, text: post.text } as PostCreateValues
+                { title: post.title, text: post.text } as CreatePostValues
               }
               onSubmit={async (values, { setErrors }) => {
                 const response = await updatePost(post.id, values);
