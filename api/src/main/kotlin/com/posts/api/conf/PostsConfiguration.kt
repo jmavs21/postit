@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 
 @Configuration
-class PostitConfiguration {
+class PostsConfiguration {
 
   @Bean
   fun localValidatorFactoryBean(): LocalValidatorFactoryBean? = LocalValidatorFactoryBean()

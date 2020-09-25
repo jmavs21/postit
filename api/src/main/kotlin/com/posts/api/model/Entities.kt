@@ -1,4 +1,4 @@
-package com.postit.api.model
+package com.posts.api.model
 
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction

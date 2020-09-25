@@ -1,4 +1,4 @@
-package com.postit.api.error
+package com.posts.api.error
 
 import org.springframework.http.HttpStatus
 
