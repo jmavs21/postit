@@ -6,7 +6,7 @@ import com.posts.api.repo.UserRepo
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -149,10 +149,11 @@ class JwtUserDetailsService(private val userRepo: UserRepo) : UserDetailsService
 @Component
 class JwtTokenUtil {
 
-  private val secret: Key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+  @Value("\${jwt.secret}")
+  private lateinit var jwtSecret: String
 
   @Value("\${jwt.expiration.millis}")
-  private var jwtExpirationMillis: Long = 0
+  private lateinit var jwtExpirationMillis: String
 
   fun getUsernameFromToken(token: String): String {
     return getAllClaimsFromToken(token).subject
@@ -172,17 +173,19 @@ class JwtTokenUtil {
   }
 
   private fun getAllClaimsFromToken(token: String?): Claims {
-    return Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).body
+    return Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).body
   }
 
   private fun doGenerateToken(claims: Map<String, Any>, email: String): String {
     return Jwts.builder().setClaims(claims).setSubject(email).setIssuedAt(Date(System.currentTimeMillis()))
-        .setExpiration(Date(System.currentTimeMillis() + jwtExpirationMillis))
-        .signWith(secret).compact()
+        .setExpiration(Date(System.currentTimeMillis() + jwtExpirationMillis.toLong()))
+        .signWith(getSigningKey()).compact()
   }
 
   private fun isTokenExpired(token: String): Boolean {
     val expiration: Date = getAllClaimsFromToken(token).expiration
     return expiration.before(Date())
   }
+
+  private fun getSigningKey(): Key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret))
 }
