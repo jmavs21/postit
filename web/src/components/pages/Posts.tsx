@@ -34,6 +34,11 @@ export const Posts: React.FC<PostsProps> = () => {
           posts: data.posts,
           hasMore: data.hasMore,
         });
+      } else {
+        setPostsState({
+          posts: [],
+          hasMore: false,
+        });
       }
       setIsLoading(false);
     })();

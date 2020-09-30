@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -37,6 +38,7 @@ import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
+import java.security.Key
 import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
@@ -79,7 +81,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
   }
 
   @Bean
-  fun passwordEncoder(): PasswordEncoder? {
+  fun passwordEncoder(): PasswordEncoder {
     return BCryptPasswordEncoder()
   }
 
@@ -144,13 +146,13 @@ class JwtUserDetailsService(private val userRepo: UserRepo) : UserDetailsService
       ?: throw ErrorFieldException(hashMapOf("email" to "the email doesn't exists"), HttpStatus.BAD_REQUEST)
 }
 
-const val JWT_TOKEN_VALIDITY = 1_000L * 60 * 60 * 24 * 31 // 1 month TODO: reduce to 1 hour: 1_000L * 60 * 60
-
 @Component
 class JwtTokenUtil {
 
-  @Value("\${jwt.secret}")
-  private lateinit var secret: String
+  private val secret: Key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+
+  @Value("\${jwt.expiration.millis}")
+  private var jwtExpirationMillis: Long = 0
 
   fun getUsernameFromToken(token: String): String {
     return getAllClaimsFromToken(token).subject
@@ -170,13 +172,13 @@ class JwtTokenUtil {
   }
 
   private fun getAllClaimsFromToken(token: String?): Claims {
-    return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
+    return Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).body
   }
 
   private fun doGenerateToken(claims: Map<String, Any>, email: String): String {
     return Jwts.builder().setClaims(claims).setSubject(email).setIssuedAt(Date(System.currentTimeMillis()))
-        .setExpiration(Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-        .signWith(SignatureAlgorithm.HS512, secret).compact()
+        .setExpiration(Date(System.currentTimeMillis() + jwtExpirationMillis))
+        .signWith(secret).compact()
   }
 
   private fun isTokenExpired(token: String): Boolean {

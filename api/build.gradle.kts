@@ -29,14 +29,18 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-security")
-  implementation("io.jsonwebtoken:jjwt:0.9.1")
-  implementation("javax.xml.bind:jaxb-api")
-  implementation("org.json:json:20190722")
+
+  implementation("io.jsonwebtoken:jjwt-api:0.11.1")
+  runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.1")
+  runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.1")
+
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   runtimeOnly("com.h2database:h2")
+
   testImplementation("org.springframework.boot:spring-boot-starter-test") {
     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
   }
