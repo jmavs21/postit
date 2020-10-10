@@ -3,7 +3,11 @@
 - TypeScript
 - React
 - Chakra UI
-- React-router-dom
+- React router dom
+- Formik
+- Axios
+- JWT decode
+- React Waypoint
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

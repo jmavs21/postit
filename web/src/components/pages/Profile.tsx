@@ -17,7 +17,7 @@ export interface ProfileValues {
 export const Profile: React.FC<ProfileProps> = ({ location }) => {
   const { user, setUser } = useContext(UserContext);
   if (!user) {
-    console.log('Error with user from context');
+    console.log('Error with user from context.');
     return null;
   }
   return (

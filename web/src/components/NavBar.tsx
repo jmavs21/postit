@@ -44,7 +44,8 @@ export const NavBar: React.FC<NavBarProps> = () => {
           <Formik
             initialValues={{ searchText: '' } as SearchValues}
             onSubmit={async (values, { setErrors }) => {
-              window.location.href = `/posts?${SEARCH_QUERY}=${values.searchText}`;
+              if (values.searchText.length !== 0)
+                window.location.href = `/posts?${SEARCH_QUERY}=${values.searchText}`;
             }}
           >
             {() => (

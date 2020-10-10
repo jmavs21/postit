@@ -55,7 +55,7 @@ class PostService(private val postRepo: PostRepo, private val voteRepo: VoteRepo
 
   @Transactional
   fun findAll(createdat: String, search: String, authUser: Any?, limit: Int): List<PostSnippetDto> {
-    val posts = if (search.isBlank()) postRepo.findPostsFeed(getDateFromCursor(createdat), PageRequest.of(0, limit)) else postRepo.findPostsFeedSearch(getDateFromCursor(createdat), "%$search%", PageRequest.of(0, limit))
+    val posts = if (search.isBlank()) postRepo.findPostsFeed(getDateFromCursor(createdat), PageRequest.of(0, limit)) else postRepo.findPostsFeedSearch(getDateFromCursor(createdat), search, PageRequest.of(0, limit))
     if (authUser == null) return posts.toList().map { it.toSnippetDto() }
     val user = authUser as User
     val votes = voteRepo.findAllByUserId(user.id)

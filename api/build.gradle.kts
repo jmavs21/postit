@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("org.springframework.boot") version "2.3.3.RELEASE"
   id("io.spring.dependency-management") version "1.0.10.RELEASE"
+  id("org.jetbrains.dokka") version "0.10.1"
   kotlin("jvm") version "1.3.72"
   kotlin("plugin.spring") version "1.3.72"
   kotlin("plugin.jpa") version "1.3.72"
@@ -21,6 +22,7 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
   mavenCentral()
+  jcenter()
 }
 
 dependencies {
@@ -41,6 +43,8 @@ dependencies {
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   runtimeOnly("com.h2database:h2")
 
+  testCompileOnly("org.springframework.security:spring-security-test")
+  testRuntimeOnly("org.apache.httpcomponents:httpclient")
   testImplementation("org.springframework.boot:spring-boot-starter-test") {
     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
   }
@@ -55,4 +59,9 @@ tasks.withType<KotlinCompile> {
     freeCompilerArgs = listOf("-Xjsr305=strict")
     jvmTarget = "1.8"
   }
+}
+
+tasks.dokka {
+  outputFormat = "html"
+  outputDirectory = "$buildDir/javadoc"
 }

@@ -1,6 +1,7 @@
 package com.posts.api.web
 
 import com.posts.api.conf.JwtTokenUtil
+import com.posts.api.conf.X_AUTH_TOKE
 import com.posts.api.error.ErrorFieldException
 import com.posts.api.model.User
 import com.posts.api.service.PostService
@@ -17,8 +18,13 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
+const val AUTH_API: String = "/api/auth"
+const val USERS_API: String = "/api/users"
+const val POSTS_API: String = "/api/posts"
+const val VOTES_API: String = "/api/votes"
+
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(AUTH_API)
 class AuthController(
     private var userService: UserService,
     private val jwtTokenUtil: JwtTokenUtil,
@@ -33,7 +39,7 @@ class AuthController(
 }
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(USERS_API)
 class UserController(
     private val userService: UserService,
     private val jwtTokenUtil: JwtTokenUtil) {
@@ -72,8 +78,8 @@ class UserController(
   private fun getHeadersWithToken(user: User): HttpHeaders {
     val token = jwtTokenUtil.generateToken(user)
     val headers = HttpHeaders()
-    headers.set("x-auth-token", token)
-    headers.set("access-control-expose-headers", "x-auth-token")
+    headers.set(X_AUTH_TOKE, token)
+    headers.set("access-control-expose-headers", X_AUTH_TOKE)
     return headers
   }
 }
@@ -81,7 +87,7 @@ class UserController(
 const val POSTS_LIMIT = 20
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping(POSTS_API)
 class PostController(private val postService: PostService) {
 
   @GetMapping("/")
@@ -106,7 +112,7 @@ class PostController(private val postService: PostService) {
 }
 
 @RestController
-@RequestMapping("/api/votes")
+@RequestMapping(VOTES_API)
 class VoteController(private val voteService: VoteService) {
 
   @PostMapping

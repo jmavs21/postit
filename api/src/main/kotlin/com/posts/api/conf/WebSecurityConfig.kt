@@ -45,6 +45,12 @@ import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+/**
+ * The web security configuration
+ * @property jwtAuthenticationEntryPoint The entry point if auth fails
+ * @property jwtUserDetailsService The service to retrieve user entity
+ * @property jwtRequestFilter The filter that retrieves token from headers and authenticate user
+ */
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
@@ -97,6 +103,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
   }
 }
 
+const val X_AUTH_TOKE = "x-auth-token"
 
 @Component
 class JwtRequestFilter : OncePerRequestFilter() {
@@ -108,7 +115,7 @@ class JwtRequestFilter : OncePerRequestFilter() {
 
   @Throws(ServletException::class, IOException::class)
   override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
-    val jwtToken = request.getHeader("x-auth-token")
+    val jwtToken = request.getHeader(X_AUTH_TOKE)
     var username: String? = null
     if (jwtToken != null && jwtToken.contains(".")) {
       try {

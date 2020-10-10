@@ -4,5 +4,7 @@
 - Spring Boot
   - Spring Web
   - Spring Data JPA
-  - Srping Security with JWT
+  - Spring Security with JWT
+  - Spring Test
 - H2 Database
+- JUnit

@@ -46,8 +46,8 @@ insert into posts (title, text, points, user_id, createdat, updatedat) values ('
 
 Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.
 
-Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.', -42, 14, '2019-11-01T10:18:55Z', '2020-09-13T11:55:53Z');
-insert into posts (title, text, points, user_id, createdat, updatedat) values ('Team-oriented global product', 'Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.', 48, 12, '2019-12-22T01:29:57Z', '2020-09-09T14:37:59Z');
+Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.', -42, 1, '2019-11-01T10:18:55Z', '2020-09-13T11:55:53Z');
+insert into posts (title, text, points, user_id, createdat, updatedat) values ('Team-oriented global product', 'Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.', 48, 1, '2019-12-22T01:29:57Z', '2020-09-09T14:37:59Z');
 insert into posts (title, text, points, user_id, createdat, updatedat) values ('Reactive multi-tasking alliance', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.
 
 Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.', 67, 10, '2019-05-28T16:47:39Z', '2020-09-08T22:31:58Z');

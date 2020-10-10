@@ -1,8 +1,7 @@
 import jwtDecode from 'jwt-decode';
 import { LoginValues } from '../components/pages/Login';
+import { TOKEN_KEY } from '../utils/constants';
 import httpService from './httpService';
-
-const tokenKey = 'token';
 
 httpService.setJwtOnCommonHeaders(getJwt());
 
@@ -32,11 +31,11 @@ export const login = async (user: LoginValues) => {
 };
 
 export const storeJwt = (jwt: string) => {
-  localStorage.setItem(tokenKey, jwt);
+  localStorage.setItem(TOKEN_KEY, jwt);
 };
 
 export const removeJwt = () => {
-  localStorage.removeItem(tokenKey);
+  localStorage.removeItem(TOKEN_KEY);
 };
 
 export const getUserFromJwt = () => {
@@ -49,7 +48,7 @@ export const getUserFromJwt = () => {
 };
 
 function getJwt() {
-  return localStorage.getItem(tokenKey) ?? '';
+  return localStorage.getItem(TOKEN_KEY) ?? '';
 }
 
 export default {
