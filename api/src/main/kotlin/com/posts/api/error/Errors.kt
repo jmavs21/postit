@@ -25,36 +25,30 @@ class ErrorFieldException(val errors: Map<String, String>, val status: HttpStatu
 class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
   @ExceptionHandler(ErrorFieldException::class)
-  fun handleErrorFieldExceptions(ex: ErrorFieldException): ResponseEntity<Any> {
-    return ResponseEntity(ex.errors, ex.status)
-  }
+  fun handleErrorFieldExceptions(ex: ErrorFieldException): ResponseEntity<Any> =
+    ResponseEntity(ex.errors, ex.status)
 
   @ExceptionHandler(ResponseStatusException::class)
-  fun handleGlobalExceptions(ex: ResponseStatusException): ResponseEntity<String> {
-    return ResponseEntity(ex.message, ex.status)
-  }
+  fun handleGlobalExceptions(ex: ResponseStatusException): ResponseEntity<String> =
+    ResponseEntity(ex.message, ex.status)
 
   @ExceptionHandler(DuplicateKeyException::class)
-  fun handleDuplicateKeyException(ex: DuplicateKeyException?): ResponseEntity<String> {
-    return ResponseEntity("Error with unique constraint.", HttpStatus.BAD_REQUEST)
-  }
+  fun handleDuplicateKeyException(ex: DuplicateKeyException?): ResponseEntity<String> =
+    ResponseEntity("Error with unique constraint.", HttpStatus.BAD_REQUEST)
 
   @ExceptionHandler(ConstraintViolationException::class)
-  fun handleConstraintViolationException(ex: ConstraintViolationException): ResponseEntity<String> {
-    return ResponseEntity("Error with constraint violation: " + ex.message, HttpStatus.BAD_REQUEST)
-  }
+  fun handleConstraintViolationException(ex: ConstraintViolationException): ResponseEntity<String> =
+    ResponseEntity("Error with constraint violation: " + ex.message, HttpStatus.BAD_REQUEST)
 
   override fun handleHttpMediaTypeNotSupported(
     ex: HttpMediaTypeNotSupportedException,
     headers: HttpHeaders,
     status: HttpStatus,
     request: WebRequest,
-  ): ResponseEntity<Any> {
-    return ResponseEntity(
-      "Error with media type not supported: " + ex.message,
-      HttpStatus.UNSUPPORTED_MEDIA_TYPE
-    )
-  }
+  ): ResponseEntity<Any> = ResponseEntity(
+    "Error with media type not supported: " + ex.message,
+    HttpStatus.UNSUPPORTED_MEDIA_TYPE
+  )
 
   override fun handleMethodArgumentNotValid(
     ex: MethodArgumentNotValidException,

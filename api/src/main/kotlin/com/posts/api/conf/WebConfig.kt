@@ -67,13 +67,14 @@ class WebSecurityConfig(
 
   @Throws(Exception::class)
   override fun configure(httpSecurity: HttpSecurity) {
-    val pat = arrayOf("/api/posts/**")
-    httpSecurity.cors().and().csrf().disable().headers().frameOptions().deny().and()
-      .authorizeRequests()
-      .antMatchers(HttpMethod.GET, *pat).permitAll().antMatchers("/api/auth", "/api/users")
-      .permitAll().anyRequest().authenticated().and().exceptionHandling()
-      .authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-      .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    httpSecurity
+      .cors().and().csrf().disable()
+      .headers().frameOptions().deny().and().authorizeRequests()
+      .antMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+      .antMatchers("/api/auth", "/api/users").permitAll()
+      .anyRequest().authenticated().and().exceptionHandling()
+      .authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
+      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
   }
 
@@ -86,19 +87,18 @@ class WebSecurityConfig(
   }
 
   @Bean
-  fun passwordEncoder(): PasswordEncoder {
-    return BCryptPasswordEncoder()
-  }
+  fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
   @Bean
   fun corsConfigurationSource(): CorsConfigurationSource? {
-    val configuration = CorsConfiguration()
-    configuration.allowedOrigins = listOf("*")
-    configuration.allowedMethods = listOf("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH")
-    configuration.allowedHeaders = listOf("*")
-    val source = UrlBasedCorsConfigurationSource()
-    source.registerCorsConfiguration("/**", configuration)
-    return source
+    val config = CorsConfiguration().apply {
+      allowedOrigins = listOf("*")
+      allowedMethods = listOf("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH")
+      allowedHeaders = listOf("*")
+    }
+    return UrlBasedCorsConfigurationSource().apply {
+      registerCorsConfiguration("/**", config)
+    }
   }
 }
 
@@ -146,11 +146,10 @@ class JwtRequestFilter(
     if (username != null && SecurityContextHolder.getContext().authentication == null) {
       val userDetails = jwtUserDetailsService.loadUserByUsername(username)
       if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-        val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(
-          userDetails, null, userDetails.authorities
-        )
-        usernamePasswordAuthenticationToken.details =
-          WebAuthenticationDetailsSource().buildDetails(request)
+        val usernamePasswordAuthenticationToken =
+          UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities).apply {
+            details = WebAuthenticationDetailsSource().buildDetails(request)
+          }
         SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
       }
     }
@@ -165,10 +164,8 @@ class JwtRequestFilter(
 class JwtUserDetailsService(val userRepo: UserRepo) : UserDetailsService {
   @Throws(UsernameNotFoundException::class)
   override fun loadUserByUsername(email: String): UserDetails = userRepo.findOneByEmail(email)
-    ?: throw ErrorFieldException(
-      hashMapOf("email" to "the email doesn't exists"),
-      HttpStatus.BAD_REQUEST
-    )
+    ?: throw ErrorFieldException(hashMapOf("email" to "the email doesn't exists"),
+      HttpStatus.BAD_REQUEST)
 }
 
 /**
@@ -182,38 +179,25 @@ class JwtTokenUtil(
   @Value("\${jwt.expiration.millis}")
   val jwtExpirationMillis: String,
 ) {
-  fun getUsernameFromToken(token: String): String {
-    return getAllClaimsFromToken(token).subject
-  }
+  fun getUsernameFromToken(token: String): String = getAllClaimsFromToken(token).subject
 
-  fun generateToken(user: User): String {
-    val claims: HashMap<String, Any> = HashMap()
-    claims["id"] = user.id
-    claims["name"] = user.name
-    claims["email"] = user.email
-    return doGenerateToken(claims, user.email)
-  }
-
-  fun validateToken(token: String, userDetails: UserDetails): Boolean {
-    val username = getUsernameFromToken(token)
-    return username == userDetails.username && !isTokenExpired(token)
-  }
-
-  private fun getAllClaimsFromToken(token: String?): Claims {
-    return Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).body
-  }
-
-  private fun doGenerateToken(claims: Map<String, Any>, email: String): String {
-    return Jwts.builder().setClaims(claims).setSubject(email)
+  fun generateToken(user: User): String =
+    Jwts.builder().setClaims(getClaims(user)).setSubject(user.email)
       .setIssuedAt(Date(System.currentTimeMillis()))
       .setExpiration(Date(System.currentTimeMillis() + jwtExpirationMillis.toLong()))
       .signWith(getSigningKey()).compact()
-  }
 
-  private fun isTokenExpired(token: String): Boolean {
-    val expiration: Date = getAllClaimsFromToken(token).expiration
-    return expiration.before(Date())
-  }
+  fun validateToken(token: String, userDetails: UserDetails): Boolean =
+    getUsernameFromToken(token) == userDetails.username && !isTokenExpired(token)
+
+  private fun getAllClaimsFromToken(token: String?): Claims =
+    Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).body
+
+  private fun getClaims(user: User): Map<String, Any> =
+    hashMapOf("id" to user.id, "name" to user.name, "email" to user.email)
+
+  private fun isTokenExpired(token: String): Boolean =
+    getAllClaimsFromToken(token).expiration.before(Date())
 
   private fun getSigningKey(): Key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret))
 }
