@@ -45,23 +45,19 @@ import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+const val X_AUTH_TOKE = "x-auth-token"
+
 /**
- * The web security configuration
- * @property jwtAuthenticationEntryPoint The entry point if auth fails
- * @property jwtUserDetailsService The service to retrieve user entity
- * @property jwtRequestFilter The filter that retrieves token from headers and authenticate user
+ * WebSecurity and HttpSecurity configuration.
+ * Including AuthenticationManager, PasswordEncoder and CORS.
  */
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-class WebSecurityConfig : WebSecurityConfigurerAdapter() {
-  @Autowired
-  private lateinit var jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint
-
-  @Autowired
-  private lateinit var jwtUserDetailsService: JwtUserDetailsService
-
-  @Autowired
-  private lateinit var jwtRequestFilter: JwtRequestFilter
+class WebSecurityConfig(
+  val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
+  val jwtUserDetailsService: JwtUserDetailsService,
+  val jwtRequestFilter: JwtRequestFilter,
+) : WebSecurityConfigurerAdapter() {
 
   @Autowired
   @Throws(Exception::class)
@@ -72,18 +68,21 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
   @Throws(Exception::class)
   override fun configure(httpSecurity: HttpSecurity) {
     val pat = arrayOf("/api/posts/**")
-    httpSecurity.cors().and().csrf().disable().headers().frameOptions().deny().and().authorizeRequests()
-        .antMatchers(HttpMethod.GET, *pat).permitAll().antMatchers("/api/auth", "/api/users")
-        .permitAll().anyRequest().authenticated().and().exceptionHandling()
-        .authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    httpSecurity.cors().and().csrf().disable().headers().frameOptions().deny().and()
+      .authorizeRequests()
+      .antMatchers(HttpMethod.GET, *pat).permitAll().antMatchers("/api/auth", "/api/users")
+      .permitAll().anyRequest().authenticated().and().exceptionHandling()
+      .authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+      .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
   }
 
   @Throws(Exception::class)
   override fun configure(web: WebSecurity) {
-    web.ignoring().antMatchers("/api/v2/api-docs", "/api/configuration/ui", "/api/swagger-resources/**",
-        "/api/configuration/security", "/api/swagger-ui.html", "/api/webjars/**", "/h2/**")
+    web.ignoring().antMatchers(
+      "/api/v2/api-docs", "/api/configuration/ui", "/api/swagger-resources/**",
+      "/api/configuration/security", "/api/swagger-ui.html", "/api/webjars/**", "/h2/**"
+    )
   }
 
   @Bean
@@ -103,18 +102,36 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
   }
 }
 
-const val X_AUTH_TOKE = "x-auth-token"
-
+/**
+ * Rejects every unauthenticated request and sends an 401 error code.
+ */
 @Component
-class JwtRequestFilter : OncePerRequestFilter() {
-  @Autowired
-  private lateinit var jwtUserDetailsService: JwtUserDetailsService
+class JwtAuthenticationEntryPoint : AuthenticationEntryPoint {
+  @Throws(IOException::class, ServletException::class)
+  override fun commence(
+    request: HttpServletRequest?, response: HttpServletResponse,
+    authException: AuthenticationException?,
+  ) = response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+}
 
-  @Autowired
-  private lateinit var jwtTokenUtil: JwtTokenUtil
+
+/**
+ * This filter gets executed for any incoming request.
+ * The filter checks if the request has a JWT token in its headers and if the token is valid then
+ * authenticates the user.
+ */
+@Component
+class JwtRequestFilter(
+  val jwtUserDetailsService: JwtUserDetailsService,
+  val jwtTokenUtil: JwtTokenUtil,
+) : OncePerRequestFilter() {
 
   @Throws(ServletException::class, IOException::class)
-  override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
+  override fun doFilterInternal(
+    request: HttpServletRequest,
+    response: HttpServletResponse,
+    filterChain: FilterChain,
+  ) {
     val jwtToken = request.getHeader(X_AUTH_TOKE)
     var username: String? = null
     if (jwtToken != null && jwtToken.contains(".")) {
@@ -130,8 +147,10 @@ class JwtRequestFilter : OncePerRequestFilter() {
       val userDetails = jwtUserDetailsService.loadUserByUsername(username)
       if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
         val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(
-            userDetails, null, userDetails.authorities)
-        usernamePasswordAuthenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+          userDetails, null, userDetails.authorities
+        )
+        usernamePasswordAuthenticationToken.details =
+          WebAuthenticationDetailsSource().buildDetails(request)
         SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
       }
     }
@@ -139,29 +158,30 @@ class JwtRequestFilter : OncePerRequestFilter() {
   }
 }
 
-@Component
-class JwtAuthenticationEntryPoint : AuthenticationEntryPoint {
-  @Throws(IOException::class, ServletException::class)
-  override fun commence(request: HttpServletRequest?, response: HttpServletResponse,
-                        authException: AuthenticationException?) = response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
-}
-
+/**
+ * AuthenticationManager will use this method to fetch the user.
+ */
 @Service
-class JwtUserDetailsService(private val userRepo: UserRepo) : UserDetailsService {
+class JwtUserDetailsService(val userRepo: UserRepo) : UserDetailsService {
   @Throws(UsernameNotFoundException::class)
   override fun loadUserByUsername(email: String): UserDetails = userRepo.findOneByEmail(email)
-      ?: throw ErrorFieldException(hashMapOf("email" to "the email doesn't exists"), HttpStatus.BAD_REQUEST)
+    ?: throw ErrorFieldException(
+      hashMapOf("email" to "the email doesn't exists"),
+      HttpStatus.BAD_REQUEST
+    )
 }
 
+/**
+ * Creates and validates JSON Web Tokens by using jsonwebtoken library.
+ */
 @Component
-class JwtTokenUtil {
-
+class JwtTokenUtil(
   @Value("\${jwt.secret}")
-  private lateinit var jwtSecret: String
+  val jwtSecret: String,
 
   @Value("\${jwt.expiration.millis}")
-  private lateinit var jwtExpirationMillis: String
-
+  val jwtExpirationMillis: String,
+) {
   fun getUsernameFromToken(token: String): String {
     return getAllClaimsFromToken(token).subject
   }
@@ -184,9 +204,10 @@ class JwtTokenUtil {
   }
 
   private fun doGenerateToken(claims: Map<String, Any>, email: String): String {
-    return Jwts.builder().setClaims(claims).setSubject(email).setIssuedAt(Date(System.currentTimeMillis()))
-        .setExpiration(Date(System.currentTimeMillis() + jwtExpirationMillis.toLong()))
-        .signWith(getSigningKey()).compact()
+    return Jwts.builder().setClaims(claims).setSubject(email)
+      .setIssuedAt(Date(System.currentTimeMillis()))
+      .setExpiration(Date(System.currentTimeMillis() + jwtExpirationMillis.toLong()))
+      .signWith(getSigningKey()).compact()
   }
 
   private fun isTokenExpired(token: String): Boolean {

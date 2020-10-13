@@ -21,53 +21,47 @@ import java.time.LocalDateTime
 
 @Service
 class UserService(
-    private val userRepo: UserRepo,
-    private val passwordEncoder: PasswordEncoder) {
-
+  private val userRepo: UserRepo,
+  private val passwordEncoder: PasswordEncoder,
+) {
   fun findAll(): Iterable<User> = userRepo.findAll()
 
   fun findOne(id: Long): User = getUserById(id)
 
   fun create(user: User): User {
-    if (userRepo.findOneByEmail(user.email) != null) throw ErrorFieldException(hashMapOf("email" to "the email already exists"), HttpStatus.BAD_REQUEST)
+    if (userRepo.findOneByEmail(user.email) != null) throw ErrorFieldException(hashMapOf("email" to "the email already exists"),
+      HttpStatus.BAD_REQUEST)
     user.password = passwordEncoder.encode(user.password)
     return userRepo.save(user)
   }
 
   fun update(id: Long, updatedUser: User): User {
-    val user = getUserById(id)
-    user.name = updatedUser.name
-    user.updatedat = LocalDateTime.now()
+    val user = getUserById(id).apply {
+      name = updatedUser.name
+      updatedat = LocalDateTime.now()
+    }
     return userRepo.save(user)
   }
 
   fun delete(id: Long) = userRepo.deleteById(getUserById(id).id)
 
   fun getUserByEmail(email: String): User = userRepo.findOneByEmail(email)
-      ?: throw ErrorFieldException(hashMapOf("email" to "the email doesn't exists"), HttpStatus.BAD_REQUEST)
+    ?: throw ErrorFieldException(
+      hashMapOf("email" to "the email doesn't exists"),
+      HttpStatus.BAD_REQUEST
+    )
 
   private fun getUserById(id: Long): User = userRepo.findByIdOrNull(id)
-      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User with id not found.")
+    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User with id not found.")
 }
 
 @Service
 class PostService(private val postRepo: PostRepo, private val voteRepo: VoteRepo) {
-
   @Transactional
   fun findAll(createdat: String, search: String, authUser: Any?, limit: Int): List<PostSnippetDto> {
-    val posts = if (search.isBlank()) postRepo.findPostsFeed(getDateFromCursor(createdat), PageRequest.of(0, limit)) else postRepo.findPostsFeedSearch(getDateFromCursor(createdat), search, PageRequest.of(0, limit))
-    if (authUser == null) return posts.toList().map { it.toSnippetDto() }
-    val user = authUser as User
-    val votes = voteRepo.findAllByUserId(user.id)
-    val mapOfVotes = hashMapOf<Long, Int>()
-    votes.forEach { mapOfVotes[it.post.id] = it.value }
-    return posts.map { post ->
-      val postDto = post.toSnippetDto()
-      if (postDto.id in mapOfVotes) {
-        postDto.voteValue = mapOfVotes.getValue(postDto.id)
-      }
-      postDto
-    }
+    val postsFeed = getPostsFeed(getDateFromCursor(createdat), search, PageRequest.of(0, limit))
+    if (authUser == null) return postsFeed.toList().map { it.toSnippetDto() }
+    return getPostsFeedWithUserVotesValues((authUser as User).id, postsFeed)
   }
 
   fun findOne(id: Long): Post = getPostById(id)
@@ -75,41 +69,84 @@ class PostService(private val postRepo: PostRepo, private val voteRepo: VoteRepo
   fun create(post: Post): Post = postRepo.save(post)
 
   fun update(id: Long, updatedPost: Post): Post {
-    val post = getPostById(id)
-    if (updatedPost.user.id != post.user.id) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Needs same user as creator of post to update.")
-    post.title = updatedPost.title
-    post.text = updatedPost.text
-    post.updatedat = LocalDateTime.now()
+    val post = getPostById(id).apply {
+      title = updatedPost.title
+      text = updatedPost.text
+      updatedat = LocalDateTime.now()
+    }
+    if (updatedPost.user.id != post.user.id) throw ResponseStatusException(
+      HttpStatus.BAD_REQUEST,
+      "Needs same user as creator of post to update."
+    )
     return postRepo.save(post)
   }
 
   fun delete(id: Long, user: User) {
     val post = getPostById(id)
-    if (post.user.id != user.id) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Needs same user as creator of post to delete.")
+    if (post.user.id != user.id) throw ResponseStatusException(
+      HttpStatus.BAD_REQUEST,
+      "Needs same user as creator of post to delete."
+    )
     postRepo.deleteById(post.id)
   }
 
-  private fun getDateFromCursor(createdat: String) = if (createdat.isBlank()) LocalDateTime.now() else LocalDateTime.parse(createdat)
+  private fun getPostsFeed(
+    cursorDate: LocalDateTime,
+    search: String,
+    limit: PageRequest,
+  ): List<Post> =
+    if (search.isBlank()) postRepo.findPostsFeed(
+      cursorDate,
+      limit
+    ) else postRepo.findPostsFeedSearch(
+      cursorDate,
+      search,
+      limit
+    )
+
+  private fun getDateFromCursor(createdat: String) =
+    if (createdat.isBlank()) LocalDateTime.now() else LocalDateTime.parse(createdat)
+
+  private fun getPostsFeedWithUserVotesValues(
+    userId: Long,
+    postsFeed: List<Post>,
+  ): List<PostSnippetDto> {
+    val postIdToValue = getMapOfUserPostsVotes(userId)
+    return postsFeed.map { post ->
+      val postDto = post.toSnippetDto()
+      if (postDto.id in postIdToValue) {
+        postDto.voteValue = postIdToValue.getValue(postDto.id)
+      }
+      postDto
+    }
+  }
+
+  private fun getMapOfUserPostsVotes(userId: Long): Map<Long, Int> {
+    val postIdToValue = hashMapOf<Long, Int>()
+    for (userVote in voteRepo.findAllByUserId(userId)) {
+      postIdToValue[userVote.post.id] = userVote.value
+    }
+    return postIdToValue
+  }
 
   private fun getPostById(id: Long): Post = postRepo.findByIdOrNull(id)
-      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found.")
+    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found.")
 }
 
 @Service
 class VoteService(private val voteRepo: VoteRepo, private val postRepo: PostRepo) {
-
   @Transactional
   fun create(isUpVote: Boolean, postId: Long, user: User): Int {
     val post = postRepo.findByIdOrNull(postId) ?: return 0
-    val vote = if (isUpVote) 1 else -1
+    val voteValue = if (isUpVote) 1 else -1
     val lastVote = voteRepo.findByIdOrNull(UserPostVote(user.id, postId))
     when {
-      lastVote == null -> post.points = post.points + vote
-      lastVote.value != vote -> post.points = post.points + (2 * vote)
+      lastVote == null -> post.points = post.points + voteValue
+      lastVote.value != voteValue -> post.points = post.points + (2 * voteValue)
       else -> return post.points
     }
     postRepo.save(post)
-    voteRepo.save(Vote(vote, user, post, UserPostVote(user.id, postId)))
+    voteRepo.save(Vote(voteValue, user, post, UserPostVote(user.id, postId)))
     return post.points
   }
 }

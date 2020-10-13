@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class PostsApiApplication
 
 fun main(args: Array<String>) {
-	runApplication<PostsApiApplication>(*args)
+  runApplication<PostsApiApplication>(*args)
 }

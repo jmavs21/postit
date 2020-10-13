@@ -11,30 +11,59 @@ import javax.persistence.*
 @Entity
 @Table(name = "posts")
 class Post(
-    @Column(nullable = false) var title: String,
-    @Column(nullable = false, columnDefinition = "TEXT")  var text: String,
-    @ManyToOne @OnDelete(action = OnDeleteAction.CASCADE) var user: User,
-    @Column(nullable = false) var points: Int = 0,
-    @Column(nullable = false) var createdat: LocalDateTime = LocalDateTime.now(),
-    @Column(nullable = false) var updatedat: LocalDateTime = LocalDateTime.now(),
-    @Column(nullable = false, updatable = false) @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0)
+  @Column(nullable = false)
+  var title: String,
+
+  @Column(nullable = false, columnDefinition = "TEXT")
+  var text: String,
+
+  @ManyToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  var user: User,
+
+  @Column(nullable = false)
+  var points: Int = 0,
+
+  @Column(nullable = false)
+  var createdat: LocalDateTime = LocalDateTime.now(),
+
+  @Column(nullable = false)
+  var updatedat: LocalDateTime = LocalDateTime.now(),
+
+  @Column(nullable = false, updatable = false)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  val id: Long = 0,
+)
+
+@Entity
+@Table(name = "votes")
+class Vote(
+  @Column(nullable = false)
+  var value: Int = 0,
+
+  @ManyToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @MapsId("userId")
+  @JoinColumn(name = "user_id")
+  var user: User,
+
+  @ManyToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @MapsId("postId")
+  @JoinColumn(name = "post_id")
+  var post: Post,
+
+  @EmbeddedId
+  val id: UserPostVote,
+)
 
 @Embeddable
 data class UserPostVote(var userId: Long, var postId: Long) : Serializable
 
 @Entity
-@Table(name = "votes")
-class Vote(
-    @Column(nullable = false) var value: Int = 0,
-    @ManyToOne @OnDelete(action = OnDeleteAction.CASCADE) @MapsId("userId") @JoinColumn(name = "user_id") var user: User,
-    @ManyToOne @OnDelete(action = OnDeleteAction.CASCADE) @MapsId("postId") @JoinColumn(name = "post_id") var post: Post,
-    @EmbeddedId val id: UserPostVote
-)
-
-@Entity
 @Table(name = "users")
 class User : UserDetails {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(nullable = false, updatable = false)
@@ -55,33 +84,19 @@ class User : UserDetails {
   @Column(nullable = false)
   var updatedat: LocalDateTime = LocalDateTime.now()
 
-  override fun getAuthorities(): Collection<GrantedAuthority?>? {
-    return ArrayList()
-  }
+  override fun getAuthorities(): Collection<GrantedAuthority?>? = ArrayList()
 
-  override fun isEnabled(): Boolean {
-    return true
-  }
+  override fun isEnabled(): Boolean = true
 
-  override fun getUsername(): String {
-    return email
-  }
+  override fun getUsername(): String = email
 
-  override fun getPassword(): String {
-    return password
-  }
+  override fun getPassword(): String = password
 
-  override fun isCredentialsNonExpired(): Boolean {
-    return true
-  }
+  override fun isCredentialsNonExpired(): Boolean = true
 
-  override fun isAccountNonExpired(): Boolean {
-    return true
-  }
+  override fun isAccountNonExpired(): Boolean = true
 
-  override fun isAccountNonLocked(): Boolean {
-    return true
-  }
+  override fun isAccountNonLocked(): Boolean = true
 
   fun setPassword(password: String) {
     this.password = password

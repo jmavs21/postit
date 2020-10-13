@@ -16,9 +16,9 @@ import java.time.LocalDateTime
 
 @DataJpaTest
 class RepositoriesTests @Autowired constructor(
-    val userRepo: UserRepo,
-    val postRepo: PostRepo,
-    val voteRepo: VoteRepo
+  val userRepo: UserRepo,
+  val postRepo: PostRepo,
+  val voteRepo: VoteRepo,
 ) {
 
   @Test
@@ -35,7 +35,8 @@ class RepositoriesTests @Autowired constructor(
 
   @Test
   fun `when postRepo-findPostsFeedSearch with word 'down' on title or text then post feed with limit`() {
-    val postsFeedSearch = postRepo.findPostsFeedSearch(LocalDateTime.now(), "down", PageRequest.of(0, POSTS_LIMIT))
+    val postsFeedSearch =
+      postRepo.findPostsFeedSearch(LocalDateTime.now(), "down", PageRequest.of(0, POSTS_LIMIT))
     assertThat(postsFeedSearch.size).isEqualTo(1)
   }
 
