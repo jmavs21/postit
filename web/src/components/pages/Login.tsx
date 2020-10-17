@@ -24,11 +24,11 @@ export const Login: React.FC<LoginProps> = ({ location }) => {
       <Formik
         initialValues={{ email: '', password: '' } as LoginValues}
         onSubmit={async (values, { setErrors }) => {
-          const response = await login(values);
-          if (response.errors) {
-            setErrors(response.errors);
+          const { data, errors } = await login(values);
+          if (errors) {
+            setErrors(errors);
           } else {
-            if (response.data && setUser) setUser(response.data);
+            if (data && setUser) setUser(data);
             window.location.href = location.state
               ? location.state.from.pathname
               : '/';

@@ -22,6 +22,7 @@ import { PostView } from './components/pages/PostView';
 const App: React.FC = () => {
   const [user, setUser] = useState(() => getUserFromJwt());
   const value = useMemo(() => ({ user, setUser }), [user, setUser]);
+
   return (
     <ThemeProvider theme={theme}>
       <ColorModeProvider>

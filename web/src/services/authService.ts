@@ -1,9 +1,8 @@
 import jwtDecode from 'jwt-decode';
 import { LoginValues } from '../components/pages/Login';
 import { TOKEN_KEY } from '../utils/constants';
+import { addJwtOnHeaders } from './httpService';
 import httpService from './httpService';
-
-httpService.setJwtOnCommonHeaders(getJwt());
 
 interface Response {
   data?: User;
@@ -19,10 +18,10 @@ export interface User {
 export const login = async (user: LoginValues) => {
   const response: Response = {};
   try {
-    const axiosResponse = await httpService.post<string>('/auth', user);
-    if (axiosResponse.data) {
-      storeJwt(axiosResponse.data);
-      response.data = jwtDecode(axiosResponse.data) as User;
+    const { data } = await httpService.post<string>('/auth', user);
+    if (data) {
+      setJwt(data);
+      response.data = getUserFromJwt() as User;
     }
   } catch (ex) {
     response.errors = ex.response.data;
@@ -30,7 +29,11 @@ export const login = async (user: LoginValues) => {
   return response;
 };
 
-export const storeJwt = (jwt: string) => {
+const getJwt = () => {
+  return localStorage.getItem(TOKEN_KEY) ?? '';
+};
+
+export const setJwt = (jwt: string) => {
   localStorage.setItem(TOKEN_KEY, jwt);
 };
 
@@ -40,20 +43,10 @@ export const removeJwt = () => {
 
 export const getUserFromJwt = () => {
   try {
-    const jwt = getJwt();
-    return jwtDecode(jwt) as User;
+    return jwtDecode(getJwt()) as User;
   } catch (ex) {
     return null;
   }
 };
 
-function getJwt() {
-  return localStorage.getItem(TOKEN_KEY) ?? '';
-}
-
-export default {
-  login,
-  removeJwt,
-  storeJwt,
-  getUserFromJwt,
-};
+addJwtOnHeaders(getJwt());

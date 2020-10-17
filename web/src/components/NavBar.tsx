@@ -6,13 +6,7 @@ import { SEARCH_QUERY } from '../utils/constants';
 import { UserContext } from '../utils/UserContext';
 import { SearchField } from './SearchField';
 
-interface NavBarProps {}
-
-export interface SearchValues {
-  searchText: string;
-}
-
-export const NavBar: React.FC<NavBarProps> = () => {
+export const NavBar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { user, setUser } = useContext(UserContext);
   return (
@@ -42,10 +36,11 @@ export const NavBar: React.FC<NavBarProps> = () => {
         </Flex>
         <Flex flex={1}>
           <Formik
-            initialValues={{ searchText: '' } as SearchValues}
-            onSubmit={async (values, { setErrors }) => {
-              if (values.searchText.length !== 0)
+            initialValues={{ searchText: '' }}
+            onSubmit={async (values) => {
+              if (values.searchText.length !== 0) {
                 window.location.href = `/posts?${SEARCH_QUERY}=${values.searchText}`;
+              }
             }}
           >
             {() => (

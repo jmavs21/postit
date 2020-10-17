@@ -1,9 +1,7 @@
 import { Flex, CircularProgress } from '@chakra-ui/core';
 import React from 'react';
 
-interface LoadingProgressProps {}
-
-export const LoadingProgress: React.FC<LoadingProgressProps> = () => {
+export const LoadingProgress: React.FC = () => {
   return (
     <Flex>
       <CircularProgress

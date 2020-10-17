@@ -37,10 +37,10 @@ export const getPosts = async (cursor: string, search: string) => {
     errors?: any;
   } = {};
   try {
-    const axiosResponse = await httpService.get<PostsRes>(
+    const { data } = await httpService.get<PostsRes>(
       `${postsApi}/?cursor=${cursor}&search=${search}`
     );
-    response.data = axiosResponse.data;
+    response.data = data;
   } catch (ex) {
     if (ex.response?.data) response.errors = ex.response.data;
     else console.log('Error on fetching posts: ', ex);
@@ -51,8 +51,8 @@ export const getPosts = async (cursor: string, search: string) => {
 export const createPost = async (post: CreatePostValues) => {
   const response: { data?: any; errors?: any } = {};
   try {
-    const axiosReponse = await httpService.post(postsApi, post);
-    response.data = axiosReponse.data;
+    const { data } = await httpService.post(postsApi, post);
+    response.data = data;
   } catch (ex) {
     response.errors = ex.response.data;
   }
@@ -65,8 +65,8 @@ export const getPostById = async (postId: string) => {
     errors?: any;
   } = {};
   try {
-    const axiosResponse = await httpService.get<Post>(`${postsApi}/${postId}`);
-    response.data = axiosResponse.data;
+    const { data } = await httpService.get<Post>(`${postsApi}/${postId}`);
+    response.data = data;
   } catch (ex) {
     if (ex.response?.data) response.errors = ex.response.data;
     else console.log('Error on fetching posts: ', ex);
@@ -87,11 +87,8 @@ export const deletePostById = async (postId: number) => {
 export const updatePost = async (postId: number, post: CreatePostValues) => {
   const response: { data?: any; errors?: any } = {};
   try {
-    const axiosReponse = await httpService.put<Post>(
-      `${postsApi}/${postId}`,
-      post
-    );
-    response.data = axiosReponse.data;
+    const { data } = await httpService.put<Post>(`${postsApi}/${postId}`, post);
+    response.data = data;
   } catch (ex) {
     response.errors = ex.response.data;
   }

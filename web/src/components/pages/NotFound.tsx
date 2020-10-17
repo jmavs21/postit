@@ -2,9 +2,7 @@ import { Alert, AlertIcon } from '@chakra-ui/core';
 import React from 'react';
 import { Wrapper } from '../Wrapper';
 
-interface NotFoundProps {}
-
-export const NotFound: React.FC<NotFoundProps> = () => {
+export const NotFound: React.FC = () => {
   return (
     <Wrapper>
       <Alert justifyContent="center" status="warning">

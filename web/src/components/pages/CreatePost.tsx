@@ -23,12 +23,9 @@ export const CreatePost: React.FC<CreatePostProps> = ({ history }) => {
           <Formik
             initialValues={{ title: '', text: '' } as CreatePostValues}
             onSubmit={async (values, { setErrors }) => {
-              const response = await createPost(values);
-              if (response.errors) {
-                setErrors(response.errors);
-              } else {
-                history.push('/posts');
-              }
+              const { errors } = await createPost(values);
+              if (errors) setErrors(errors);
+              else history.push('/posts');
             }}
           >
             {({ isSubmitting }) => (

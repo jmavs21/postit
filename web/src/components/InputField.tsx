@@ -21,8 +21,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const [field, { error }] = useField(props);
-  let InputOrTextarea = Input;
-  if (textarea) InputOrTextarea = Textarea;
+  let InputOrTextarea = textarea ? Textarea : Input;
   return (
     <FormControl isInvalid={!!error}>
       {label && <FormLabel htmlFor={field.name}>{label}</FormLabel>}

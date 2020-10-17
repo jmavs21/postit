@@ -24,11 +24,8 @@ export const Register: React.FC<RegisterProps> = () => {
         initialValues={{ email: '', password: '', name: '' } as RegisterValues}
         onSubmit={async (values, { setErrors }) => {
           const response = await registerUser(values);
-          if (response.errors) {
-            setErrors(response.errors);
-          } else {
-            window.location.href = '/';
-          }
+          if (response.errors) setErrors(response.errors);
+          else window.location.href = '/';
         }}
       >
         {({ isSubmitting }) => (

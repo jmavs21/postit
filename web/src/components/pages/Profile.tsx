@@ -25,11 +25,11 @@ export const Profile: React.FC<ProfileProps> = ({ location }) => {
       <Formik
         initialValues={{ name: user.name } as ProfileValues}
         onSubmit={async (values, { setErrors }) => {
-          const response = await updateUser(values, user.id);
-          if (response.errors) {
-            setErrors(response.errors);
+          const { data, errors } = await updateUser(values, user.id);
+          if (errors) {
+            setErrors(errors);
           } else {
-            if (response.data && setUser) setUser(response.data);
+            if (data && setUser) setUser(data);
             window.location.href = location.state
               ? location.state.from.pathname
               : '/';

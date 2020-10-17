@@ -81,8 +81,8 @@ class WebSecurityConfig(
   @Throws(Exception::class)
   override fun configure(web: WebSecurity) {
     web.ignoring().antMatchers(
-      "/api/v2/api-docs", "/api/configuration/ui", "/api/swagger-resources/**",
-      "/api/configuration/security", "/api/swagger-ui.html", "/api/webjars/**", "/h2/**"
+      "/v2/api-docs", "/configuration/ui", "/swagger-resources/**",
+      "/configuration/security", "/swagger-ui.html", "/webjars/**", "/h2/**"
     )
   }
 
@@ -133,17 +133,26 @@ class JwtRequestFilter(
     filterChain: FilterChain,
   ) {
     val jwtToken = request.getHeader(X_AUTH_TOKE)
-    var username: String? = null
+    val username = getValidUsernameFromToken(jwtToken)
+    if (jwtToken != null && username != null) authenticateUser(request, jwtToken, username)
+    filterChain.doFilter(request, response)
+  }
+
+  private fun getValidUsernameFromToken(jwtToken: String?): String? {
     if (jwtToken != null && jwtToken.contains(".")) {
       try {
-        username = jwtTokenUtil.getUsernameFromToken(jwtToken)
+        return jwtTokenUtil.getUsernameFromToken(jwtToken)
       } catch (e: IllegalArgumentException) {
         logger.error("Unable to get JWT Token.")
       } catch (e: ExpiredJwtException) {
         logger.error("JWT Token has expired.")
       }
     }
-    if (username != null && SecurityContextHolder.getContext().authentication == null) {
+    return null
+  }
+
+  private fun authenticateUser(request: HttpServletRequest, jwtToken: String, username: String) {
+    if (SecurityContextHolder.getContext().authentication == null) {
       val userDetails = jwtUserDetailsService.loadUserByUsername(username)
       if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
         val usernamePasswordAuthenticationToken =
@@ -153,7 +162,6 @@ class JwtRequestFilter(
         SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
       }
     }
-    filterChain.doFilter(request, response)
   }
 }
 

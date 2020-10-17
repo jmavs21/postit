@@ -9,14 +9,12 @@ import { LoadingProgress } from '../LoadingProgress';
 import { Votes } from '../Votes';
 import { Wrapper } from '../Wrapper';
 
-interface PostsProps {}
-
 const getSearchQuery = (search: string) => {
   const query = new URLSearchParams(search).get(SEARCH_QUERY);
   return query ? query : '';
 };
 
-export const Posts: React.FC<PostsProps> = () => {
+export const Posts: React.FC = () => {
   const { user } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const { search } = useLocation();

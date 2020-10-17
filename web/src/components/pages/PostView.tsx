@@ -44,8 +44,8 @@ export const PostView: React.FC<PostViewProps> = ({ history, ...props }) => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      const response = await getPostById(postId);
-      if (response.data) setPost(response.data);
+      const { data } = await getPostById(postId);
+      if (data) setPost(data);
       setIsLoading(false);
     };
     fetchData();
@@ -91,12 +91,9 @@ export const PostView: React.FC<PostViewProps> = ({ history, ...props }) => {
                 { title: post.title, text: post.text } as CreatePostValues
               }
               onSubmit={async (values, { setErrors }) => {
-                const response = await updatePost(post.id, values);
-                if (response.errors) {
-                  setErrors(response.errors);
-                } else {
-                  history.push('/posts');
-                }
+                const { errors } = await updatePost(post.id, values);
+                if (errors) setErrors(errors);
+                else history.push('/posts');
               }}
             >
               {({ isSubmitting }) => (

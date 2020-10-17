@@ -14,9 +14,9 @@ export const Votes: React.FC<VotesProps> = ({ post, isUser }) => {
   const [isVoteLoading, setIsVoteLoading] = useState<loadingStates>('no');
   const callVote = async (postId: number, isUpVote: boolean, load: string) => {
     setIsVoteLoading(load as loadingStates);
-    const response = await createVote({ postId, isUpVote });
-    if (response.data != null) {
-      post.points = response.data;
+    const { data } = await createVote({ postId, isUpVote });
+    if (data != null) {
+      post.points = data;
       post.voteValue = isUpVote ? 1 : -1;
     }
     setIsVoteLoading('no');

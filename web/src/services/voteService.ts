@@ -10,8 +10,8 @@ interface VoteCreateValues {
 export const createVote = async (vote: VoteCreateValues) => {
   const response: { data?: any; errors?: any } = {};
   try {
-    const axiosReponse = await httpService.post(votesApi, vote);
-    response.data = axiosReponse.data;
+    const { data } = await httpService.post(votesApi, vote);
+    response.data = data;
   } catch (ex) {
     response.errors = ex.response.data;
   }
