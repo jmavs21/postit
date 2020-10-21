@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { CreatePostValues } from '../components/pages/CreatePost';
 import { User } from './authService';
 import httpService from './httpService';
@@ -18,6 +19,7 @@ export interface PostSnippet {
   user: User;
   createdat: string;
   udpatedat: string;
+  isFollow: boolean;
 }
 
 export interface Post {
@@ -40,6 +42,7 @@ export const getPosts = async (cursor: string, search: string) => {
     const { data } = await httpService.get<PostsRes>(
       `${postsApi}/?cursor=${cursor}&search=${search}`
     );
+    data.posts = _.orderBy(data.posts, [(p) => p.isFollow], ['desc']);
     response.data = data;
   } catch (ex) {
     if (ex.response?.data) response.errors = ex.response.data;

@@ -12,6 +12,7 @@ type loadingStates = 'no' | 'up' | 'down';
 
 export const Votes: React.FC<VotesProps> = ({ post, isUser }) => {
   const [isVoteLoading, setIsVoteLoading] = useState<loadingStates>('no');
+
   const callVote = async (postId: number, isUpVote: boolean, load: string) => {
     setIsVoteLoading(load as loadingStates);
     const { data } = await createVote({ postId, isUpVote });
@@ -21,6 +22,7 @@ export const Votes: React.FC<VotesProps> = ({ post, isUser }) => {
     }
     setIsVoteLoading('no');
   };
+
   return (
     <Flex direction="column" align="center" justify="center" mr={4}>
       <IconButton
@@ -34,7 +36,9 @@ export const Votes: React.FC<VotesProps> = ({ post, isUser }) => {
         icon="arrow-up"
         isDisabled={!isUser}
       />
-      <Text padding={1}>{post.points}</Text>
+      <Text as="b" padding={1}>
+        {post.points}
+      </Text>
       <IconButton
         variantColor={post.voteValue === -1 ? 'red' : undefined}
         isLoading={isVoteLoading === 'down'}

@@ -45,7 +45,7 @@ data class PostDtoReq(
   @field:Size(min = 1, max = 50)
   val title: String,
 
-  @field:Size(min = 1, max = 255)
+  @field:Size(min = 1, max = 500)
   val text: String,
 ) {
   fun toEntity(user: User): Post {
@@ -68,6 +68,7 @@ data class PostSnippetDto(
   var textSnippet: String,
   var points: Int,
   var voteValue: Int,
+  var isFollow: Boolean,
   var user: UserDto,
   var createdat: LocalDateTime?,
   var updatedat: LocalDateTime?,
@@ -96,6 +97,7 @@ fun Post.toSnippetDto() = PostSnippetDto(
   text.substring(0, minOf(text.length, 200)),
   points,
   0,
+  false,
   user.toDto(),
   createdat,
   updatedat,
@@ -105,4 +107,8 @@ fun Post.toSnippetDto() = PostSnippetDto(
 data class VoteCreateDtoReq(
   var postId: Long,
   var isUpVote: Boolean,
+)
+
+data class FollowCreateDtoReq(
+  var toId: Long,
 )

@@ -45,7 +45,11 @@ export const NavBar: React.FC = () => {
           >
             {() => (
               <Form style={{ width: '100%' }}>
-                <SearchField name="searchText" placeholder="Search..." />
+                <SearchField
+                  name="searchText"
+                  placeholder="Search..."
+                  colorMode={colorMode}
+                />
               </Form>
             )}
           </Formik>

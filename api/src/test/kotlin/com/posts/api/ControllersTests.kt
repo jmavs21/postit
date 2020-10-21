@@ -494,6 +494,52 @@ class ControllersTests {
     }
   }
 
+  @Nested
+  inner class FollowsControllerTests {
+    @Test
+    fun `when api-follows POST with follow and headers then Followed and 201`() {
+      val response: ResponseEntity<String> = testRestTemplate.exchange(
+        FOLLOWS_API,
+        HttpMethod.POST,
+        HttpEntity(FollowCreateDtoReq(2), getAuthHeaders()),
+        String::class.java
+      )
+      assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+      assertThat(response.body).isEqualTo("Followed")
+    }
+
+    @Test
+    fun `when api-follows POST with follow and no headers then 401`() {
+      val response: ResponseEntity<String> = testRestTemplate.exchange(
+        FOLLOWS_API,
+        HttpMethod.POST,
+        HttpEntity(FollowCreateDtoReq(2)),
+        String::class.java
+      )
+      assertThat(response.statusCode).isEqualTo(HttpStatus.UNAUTHORIZED)
+    }
+
+    @Test
+    fun `when api-follows POST with follow and unfollow and headers then Followed, Unfollowed and 201`() {
+      var response: ResponseEntity<String> = testRestTemplate.exchange(
+        FOLLOWS_API,
+        HttpMethod.POST,
+        HttpEntity(FollowCreateDtoReq(4), getAuthHeaders()),
+        String::class.java
+      )
+      assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+      assertThat(response.body).isEqualTo("Followed")
+      response = testRestTemplate.exchange(
+        FOLLOWS_API,
+        HttpMethod.POST,
+        HttpEntity(FollowCreateDtoReq(4), getAuthHeaders()),
+        String::class.java
+      )
+      assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+      assertThat(response.body).isEqualTo("Unfollowed")
+    }
+  }
+
   private fun getAuthHeaders(): HttpHeaders {
     val headers = HttpHeaders()
     headers[X_AUTH_TOKE] =

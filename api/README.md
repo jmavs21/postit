@@ -5,6 +5,6 @@
   - Spring Web
   - Spring Data JPA
   - Spring Security with JWT
-  - Spring Test
+  - Spring Validation
 - H2 Database
 - JUnit

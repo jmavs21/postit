@@ -1,10 +1,11 @@
-import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/core';
+import { Box, Flex, Heading, Link, Stack, Text } from '@chakra-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Waypoint } from 'react-waypoint';
-import { getPosts, PostsRes } from '../../services/postService';
+import { getPosts, PostSnippet, PostsRes } from '../../services/postService';
 import { SEARCH_QUERY } from '../../utils/constants';
 import { UserContext } from '../../utils/UserContext';
+import { Follow } from '../Follow';
 import { LoadingProgress } from '../LoadingProgress';
 import { Votes } from '../Votes';
 import { Wrapper } from '../Wrapper';
@@ -45,20 +46,40 @@ export const Posts: React.FC = () => {
   const loadMore = async () => {
     setIsLoading(true);
     const { data } = await getPosts(
-      postsState.posts.length !== 0
-        ? postsState.posts[postsState.posts.length - 1].createdat
-        : '',
+      getLastDate(postsState.posts),
       getSearchQuery(search)
     );
     if (data) {
-      const postsResCopy = JSON.parse(JSON.stringify(postsState));
-      postsResCopy.posts.push(...data.posts);
+      const posts = getPostsCopy().posts;
+      posts.push(...data.posts);
       setPostsState({
-        posts: postsResCopy.posts,
+        posts,
         hasMore: data.hasMore,
       });
     }
     setIsLoading(false);
+  };
+
+  const getLastDate = (posts: PostSnippet[]) => {
+    if (posts.length === 0) return '';
+    return posts.reduce((p1, p2) =>
+      new Date(p1.createdat) < new Date(p2.createdat) ? p1 : p2
+    ).createdat;
+  };
+
+  const getPostsCopy = () => {
+    return JSON.parse(JSON.stringify(postsState));
+  };
+
+  const changePostsFollows = (toId: number, isFollow: boolean) => {
+    const posts = getPostsCopy().posts;
+    for (const p of posts) {
+      if (p.user.id === toId) p.isFollow = isFollow;
+    }
+    setPostsState({
+      posts,
+      hasMore: postsState.hasMore,
+    });
   };
 
   return (
@@ -72,10 +93,25 @@ export const Posts: React.FC = () => {
               <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
                 <Votes key={p.id} post={p} isUser={user !== null} />
                 <Box>
-                  <Heading fontSize="xl">
-                    <NavLink to={'/posts/' + p.id}>{p.title}</NavLink>
-                  </Heading>
-                  <Text as="i">{p.user.name}</Text>
+                  <Link as="header">
+                    <NavLink to={'/posts/' + p.id}>
+                      <Heading fontSize="xl">{p.title}</Heading>
+                    </NavLink>
+                  </Link>
+                  <Flex>
+                    <Follow
+                      key={p.id}
+                      changePostsFollows={changePostsFollows}
+                      post={p}
+                      from={user}
+                      toId={p.user.id}
+                    />
+                    <Link as="i">
+                      <NavLink to={'/posts?search=' + p.user.name}>
+                        {p.user.name}
+                      </NavLink>
+                    </Link>
+                  </Flex>
                   <Text mt={4}>{p.textSnippet}...</Text>
                 </Box>
               </Flex>

@@ -1,10 +1,8 @@
 package com.posts.api.service
 
 import com.posts.api.error.ErrorFieldException
-import com.posts.api.model.Post
-import com.posts.api.model.User
-import com.posts.api.model.UserPostVote
-import com.posts.api.model.Vote
+import com.posts.api.model.*
+import com.posts.api.repo.FollowRepo
 import com.posts.api.repo.PostRepo
 import com.posts.api.repo.UserRepo
 import com.posts.api.repo.VoteRepo
@@ -56,12 +54,16 @@ class UserService(
 }
 
 @Service
-class PostService(private val postRepo: PostRepo, private val voteRepo: VoteRepo) {
+class PostService(
+  private val postRepo: PostRepo,
+  private val voteRepo: VoteRepo,
+  private val followRepo: FollowRepo,
+) {
   @Transactional
   fun findAll(createdat: String, search: String, authUser: Any?, limit: Int): List<PostSnippetDto> {
     val postsFeed = getPostsFeed(getDateFromCursor(createdat), search, PageRequest.of(0, limit))
     if (authUser == null) return postsFeed.toList().map { it.toSnippetDto() }
-    return getPostsFeedWithUserVotesValues((authUser as User).id, postsFeed)
+    return getPostsFeedForUser((authUser as User).id, postsFeed)
   }
 
   fun findOne(id: Long): Post = getPostById(id)
@@ -107,19 +109,22 @@ class PostService(private val postRepo: PostRepo, private val voteRepo: VoteRepo
   private fun getDateFromCursor(createdat: String) =
     if (createdat.isBlank()) LocalDateTime.now() else LocalDateTime.parse(createdat)
 
-  private fun getPostsFeedWithUserVotesValues(
+  private fun getPostsFeedForUser(
     userId: Long,
     postsFeed: List<Post>,
   ): List<PostSnippetDto> {
+    val followees = getFollowees(userId)
     val postIdToValue = getMapOfUserPostsVotes(userId)
     return postsFeed.map { post ->
       val postDto = post.toSnippetDto()
-      if (postDto.id in postIdToValue) {
-        postDto.voteValue = postIdToValue.getValue(postDto.id)
-      }
+      if (post.user.id in followees) postDto.isFollow = true
+      if (postDto.id in postIdToValue) postDto.voteValue = postIdToValue.getValue(postDto.id)
       postDto
     }
   }
+
+  private fun getFollowees(userId: Long) =
+    followRepo.findAllByFromId(userId).map { it.to.id }.toSet()
 
   private fun getMapOfUserPostsVotes(userId: Long): Map<Long, Int> {
     val postIdToValue = hashMapOf<Long, Int>()
@@ -139,14 +144,32 @@ class VoteService(private val voteRepo: VoteRepo, private val postRepo: PostRepo
   fun create(isUpVote: Boolean, postId: Long, user: User): Int {
     val post = postRepo.findByIdOrNull(postId) ?: return 0
     val voteValue = if (isUpVote) 1 else -1
-    val lastVote = voteRepo.findByIdOrNull(UserPostVote(user.id, postId))
+    val lastVote = voteRepo.findByIdOrNull(VoteId(user.id, postId))
     when {
       lastVote == null -> post.points = post.points + voteValue
       lastVote.value != voteValue -> post.points = post.points + (2 * voteValue)
       else -> return post.points
     }
     postRepo.save(post)
-    voteRepo.save(Vote(voteValue, user, post, UserPostVote(user.id, postId)))
+    voteRepo.save(Vote(voteValue, user, post, VoteId(user.id, postId)))
     return post.points
+  }
+}
+
+@Service
+class FollowService(private val followRepo: FollowRepo, private val userRepo: UserRepo) {
+  @Transactional
+  fun create(from: User, toId: Long): String {
+    val to = userRepo.findByIdOrNull(toId)
+    println("fromId: ${from.id}, toId: ${to?.id}")
+    if (to == null || from.id == to.id) return "Unchanged"
+    val follow = followRepo.findAllByFromId(from.id).firstOrNull { it.to.id == to.id }
+    return if (follow == null) {
+      followRepo.save(Follow(from, to, FollowId(from.id, to.id)))
+      "Followed"
+    } else {
+      followRepo.delete(follow)
+      "Unfollowed"
+    }
   }
 }

@@ -9,6 +9,8 @@ npm i jwt-decode --save
 npm i @types/jwt-decode --save
 npm i immer --save 
 npm i react-waypoint --save
+npm i lodash --save
+npm i @types/lodash --save
 
 -- INDEX SETUP --
 index.tsx

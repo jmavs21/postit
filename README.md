@@ -1,6 +1,6 @@
 # Posts
 
-A full-stack posts web application.
+A posts web application.
 
 ## Features
 
@@ -9,6 +9,7 @@ A full-stack posts web application.
 - Create, update and delete a post
 - Voting on posts
 - Search posts
+- Follow users
 - Pagination
 - Light and dark modes
 
@@ -28,4 +29,5 @@ A full-stack posts web application.
   - Spring Web
   - Spring Data JPA
   - Srping Security with JWT
+  - Spring Validation
 - H2 Database

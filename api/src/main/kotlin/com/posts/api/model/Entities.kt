@@ -55,11 +55,33 @@ class Vote(
   var post: Post,
 
   @EmbeddedId
-  val id: UserPostVote,
+  val id: VoteId,
 )
 
 @Embeddable
-data class UserPostVote(var userId: Long, var postId: Long) : Serializable
+data class VoteId(var userId: Long, var postId: Long) : Serializable
+
+@Entity
+@Table(name = "follows")
+class Follow(
+  @ManyToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @MapsId("fromId")
+  @JoinColumn(name = "from_id")
+  var from: User,
+
+  @ManyToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @MapsId("toId")
+  @JoinColumn(name = "to_id")
+  var to: User,
+
+  @EmbeddedId
+  val id: FollowId,
+)
+
+@Embeddable
+data class FollowId(var fromId: Long, var toId: Long) : Serializable
 
 @Entity
 @Table(name = "users")

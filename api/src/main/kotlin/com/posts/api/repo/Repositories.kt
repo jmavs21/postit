@@ -1,9 +1,6 @@
 package com.posts.api.repo
 
-import com.posts.api.model.Post
-import com.posts.api.model.User
-import com.posts.api.model.UserPostVote
-import com.posts.api.model.Vote
+import com.posts.api.model.*
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
@@ -33,7 +30,8 @@ interface PostRepo : PagingAndSortingRepository<Post, Long> {
       ON p.user.id = u.id 
     WHERE p.createdat < :createdat AND (
         LOWER(p.title) LIKE LOWER('%'||:search||'%') OR 
-        LOWER(p.text)  LIKE LOWER('%'||:search||'%')
+        LOWER(p.text)  LIKE LOWER('%'||:search||'%') OR
+        LOWER(u.name)  LIKE LOWER('%'||:search||'%')
       ) 
     ORDER BY p.createdat DESC
   """)
@@ -44,6 +42,10 @@ interface PostRepo : PagingAndSortingRepository<Post, Long> {
   ): List<Post>
 }
 
-interface VoteRepo : CrudRepository<Vote, UserPostVote> {
+interface VoteRepo : CrudRepository<Vote, VoteId> {
   fun findAllByUserId(userId: Long): List<Vote>
+}
+
+interface FollowRepo : CrudRepository<Follow, FollowId> {
+  fun findAllByFromId(fromId: Long): List<Follow>
 }

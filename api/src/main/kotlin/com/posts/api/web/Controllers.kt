@@ -4,6 +4,7 @@ import com.posts.api.conf.JwtTokenUtil
 import com.posts.api.conf.X_AUTH_TOKE
 import com.posts.api.error.ErrorFieldException
 import com.posts.api.model.User
+import com.posts.api.service.FollowService
 import com.posts.api.service.PostService
 import com.posts.api.service.UserService
 import com.posts.api.service.VoteService
@@ -22,6 +23,7 @@ const val AUTH_API: String = "/api/auth"
 const val USERS_API: String = "/api/users"
 const val POSTS_API: String = "/api/posts"
 const val VOTES_API: String = "/api/votes"
+const val FOLLOWS_API: String = "/api/follows"
 const val POSTS_LIMIT = 20
 
 @RestController
@@ -128,4 +130,13 @@ class VoteController(private val voteService: VoteService) {
   @ResponseStatus(CREATED)
   fun create(@Valid @RequestBody newVote: VoteCreateDtoReq, auth: Authentication): Int =
     voteService.create(newVote.isUpVote, newVote.postId, auth.principal as User)
+}
+
+@RestController
+@RequestMapping(FOLLOWS_API)
+class FollowController(private val followService: FollowService) {
+  @PostMapping
+  @ResponseStatus(CREATED)
+  fun create(@Valid @RequestBody newFollow: FollowCreateDtoReq, auth: Authentication): String =
+    followService.create(auth.principal as User, newFollow.toId)
 }
