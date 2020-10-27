@@ -1,9 +1,21 @@
-import { Box, Button } from '@chakra-ui/core';
+import {
+  Box,
+  Button,
+  Divider,
+  Heading,
+  Link,
+  List,
+  ListItem,
+} from '@chakra-ui/core';
 import { Formik, Form } from 'formik';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { User } from '../../services/authService';
+import { getFollowers, getFollows } from '../../services/followService';
 import { updateUser } from '../../services/userService';
 import { UserContext } from '../../utils/UserContext';
 import { InputField } from '../InputField';
+import { LoadingProgress } from '../LoadingProgress';
 import { Wrapper } from '../Wrapper';
 
 interface ProfileProps {
@@ -16,10 +28,25 @@ export interface ProfileValues {
 
 export const Profile: React.FC<ProfileProps> = ({ location }) => {
   const { user, setUser } = useContext(UserContext);
-  if (!user) {
-    console.log('Error with user from context.');
-    return null;
-  }
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [follows, setFollows] = useState<User[]>([]);
+  const [followers, setFollowers] = useState<User[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      setIsLoading(true);
+      let { data } = await getFollows(user.id);
+      if (data) setFollows(data);
+      let { data: data2 } = await getFollowers(user.id);
+      if (data2) setFollowers(data2);
+      setIsLoading(false);
+    })();
+  }, [user]);
+
+  if (!user) return null;
+
   return (
     <Wrapper variant="small">
       <Formik
@@ -52,6 +79,34 @@ export const Profile: React.FC<ProfileProps> = ({ location }) => {
           </Form>
         )}
       </Formik>
+      <Divider m={4} />
+      {isLoading ? (
+        <LoadingProgress />
+      ) : (
+        <>
+          <Heading size="lg">Following</Heading>
+          <List styleType="disc" pl={4}>
+            {follows.map((u) => (
+              <ListItem key={u.id} p={1}>
+                <Link as="i">
+                  <NavLink to={'/posts?search=' + u.name}>{u.name}</NavLink>
+                </Link>
+              </ListItem>
+            ))}
+          </List>
+          <Divider m={4} />
+          <Heading size="lg">Followers</Heading>
+          <List styleType="disc" pl={4}>
+            {followers.map((u) => (
+              <ListItem key={'to' + u.id} p={1}>
+                <Link as="i">
+                  <NavLink to={'/posts?search=' + u.name}>{u.name}</NavLink>
+                </Link>
+              </ListItem>
+            ))}
+          </List>
+        </>
+      )}
     </Wrapper>
   );
 };

@@ -6,20 +6,8 @@ import httpService from './httpService';
 const postsApi = '/posts';
 
 export interface PostsRes {
-  posts: PostSnippet[];
+  posts: Post[];
   hasMore: boolean;
-}
-
-export interface PostSnippet {
-  id: number;
-  title: string;
-  textSnippet: string;
-  voteValue: number;
-  points: number;
-  user: User;
-  createdat: string;
-  udpatedat: string;
-  isFollow: boolean;
 }
 
 export interface Post {
@@ -31,6 +19,7 @@ export interface Post {
   user: User;
   createdat: string;
   udpatedat: string;
+  isFollow: boolean;
 }
 
 export const getPosts = async (cursor: string, search: string) => {

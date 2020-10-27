@@ -37,7 +37,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ history }) => {
                   <InputField
                     textarea
                     name="text"
-                    placeholder="text..."
+                    placeholder="text"
                     label="Text"
                   />
                 </Box>

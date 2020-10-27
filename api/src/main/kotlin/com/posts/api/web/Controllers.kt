@@ -103,7 +103,8 @@ class PostController(private val postService: PostService) {
   }
 
   @GetMapping("/{id}")
-  fun findOne(@PathVariable id: Long): PostDto = postService.findOne(id).toDto()
+  fun findOne(@PathVariable id: Long, @AuthenticationPrincipal user: User?): PostDto =
+    postService.findOne(id, user)
 
   @PostMapping
   @ResponseStatus(CREATED)
@@ -139,4 +140,12 @@ class FollowController(private val followService: FollowService) {
   @ResponseStatus(CREATED)
   fun create(@Valid @RequestBody newFollow: FollowCreateDtoReq, auth: Authentication): String =
     followService.create(auth.principal as User, newFollow.toId)
+
+  @GetMapping("/{id}")
+  fun findFollows(@PathVariable id: Long): List<UserDto> =
+    followService.findFollows(id).map { it.toDto() }
+
+  @GetMapping("/to/{id}")
+  fun findFollowers(@PathVariable id: Long): List<UserDto> =
+    followService.findFollowers(id).map { it.toDtoFrom() }
 }

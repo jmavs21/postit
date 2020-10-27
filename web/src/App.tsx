@@ -18,6 +18,7 @@ import { Profile } from './components/pages/Profile';
 import { CreatePost } from './components/pages/CreatePost';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PostView } from './components/pages/PostView';
+import { PostUpdate } from './components/PostUpdate';
 
 const App: React.FC = () => {
   const [user, setUser] = useState(() => getUserFromJwt());
@@ -35,6 +36,7 @@ const App: React.FC = () => {
             <Route path="/logout" component={Logout} />
             <ProtectedRoute path="/profile" component={Profile} />
             <ProtectedRoute path="/posts/new" component={CreatePost} />
+            <Route path="/posts/udpate/:id" component={PostUpdate} />
             <Route path="/posts/:id" component={PostView} />
             <Route path="/posts" component={Posts} />
             <Route path="/not-found" component={NotFound} />

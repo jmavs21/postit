@@ -1,10 +1,10 @@
 import { Flex, IconButton, Text } from '@chakra-ui/core';
 import React, { useState } from 'react';
-import { PostSnippet } from '../services/postService';
+import { Post } from '../services/postService';
 import { createVote } from '../services/voteService';
 
 interface VotesProps {
-  post: PostSnippet;
+  post: Post;
   isUser: boolean;
 }
 

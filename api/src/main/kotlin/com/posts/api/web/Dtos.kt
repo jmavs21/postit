@@ -1,5 +1,6 @@
 package com.posts.api.web
 
+import com.posts.api.model.Follow
 import com.posts.api.model.Post
 import com.posts.api.model.User
 import java.time.LocalDateTime
@@ -65,7 +66,7 @@ fun User.toDto() = UserDto(name, email, createdat, updatedat, id)
 
 data class PostSnippetDto(
   var title: String,
-  var textSnippet: String,
+  var text: String,
   var points: Int,
   var voteValue: Int,
   var isFollow: Boolean,
@@ -84,17 +85,19 @@ data class PostDto(
   var title: String,
   var text: String,
   var points: Int,
+  var voteValue: Int,
+  var isFollow: Boolean,
   var user: UserDto,
   var createdat: LocalDateTime?,
   var updatedat: LocalDateTime?,
   var id: Long?,
 )
 
-fun Post.toDto() = PostDto(title, text, points, user.toDto(), createdat, updatedat, id)
+fun Post.toDto() = PostDto(title, text, points, 0, false, user.toDto(), createdat, updatedat, id)
 
 fun Post.toSnippetDto() = PostSnippetDto(
   title,
-  text.substring(0, minOf(text.length, 200)),
+  "${text.substring(0, minOf(text.length, 200))}...",
   points,
   0,
   false,
@@ -112,3 +115,7 @@ data class VoteCreateDtoReq(
 data class FollowCreateDtoReq(
   var toId: Long,
 )
+
+fun Follow.toDto() = to.toDto()
+
+fun Follow.toDtoFrom() = from.toDto()

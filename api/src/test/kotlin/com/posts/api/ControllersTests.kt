@@ -538,6 +538,68 @@ class ControllersTests {
       assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
       assertThat(response.body).isEqualTo("Unfollowed")
     }
+
+    @Test
+    fun `when api-follows GET with valid fromID and headers then follows 2 and 200`() {
+      testRestTemplate.exchange(
+        FOLLOWS_API,
+        HttpMethod.POST,
+        HttpEntity(FollowCreateDtoReq(5), getAuthHeaders()),
+        String::class.java
+      )
+      testRestTemplate.exchange(
+        FOLLOWS_API,
+        HttpMethod.POST,
+        HttpEntity(FollowCreateDtoReq(6), getAuthHeaders()),
+        String::class.java
+      )
+      val response: ResponseEntity<Array<UserDto>> = testRestTemplate.exchange(
+        "$FOLLOWS_API/1",
+        HttpMethod.GET,
+        HttpEntity<Any>(getAuthHeaders()),
+        Array<UserDto>::class.java
+      )
+      println("response = ${response.body}")
+      assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+      assertThat(response.body?.size).isEqualTo(2)
+    }
+
+    @Test
+    fun `when api-follows GET with valid fromID but no headers then 401`() {
+      val response: ResponseEntity<String> =
+        testRestTemplate.getForEntity("$FOLLOWS_API/1", String::class.java)
+      assertThat(response.statusCode).isEqualTo(HttpStatus.UNAUTHORIZED)
+    }
+
+    @Test
+    fun `when api-follows-to GET with valid toID and headers then follows 1 and 200`() {
+      testRestTemplate.exchange(
+        FOLLOWS_API,
+        HttpMethod.POST,
+        HttpEntity(FollowCreateDtoReq(1),
+          HttpHeaders().apply {
+            set(X_AUTH_TOKE,
+              "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiTXVpcmUiLCJpZCI6NSwiZW1haWwiOiJtZWxpczRAdWNzZC5lZHUiLCJzdWIiOiJtZWxpczRAdWNzZC5lZHUiLCJpYXQiOjE2MDM3NTM4MjQsImV4cCI6MTkxOTE1MzgyNH0.pU9XxVSJ8ai5iXwfvVN5KjmwaN1mfeDZzgdSUld9K7g")
+          }),
+        String::class.java
+      )
+      val response: ResponseEntity<Array<UserDto>> = testRestTemplate.exchange(
+        "$FOLLOWS_API/to/1",
+        HttpMethod.GET,
+        HttpEntity<Any>(getAuthHeaders()),
+        Array<UserDto>::class.java
+      )
+      println("response = ${response.body}")
+      assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+      assertThat(response.body?.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `when api-follows-to GET with valid toID but no headers then 401`() {
+      val response: ResponseEntity<String> =
+        testRestTemplate.getForEntity("$FOLLOWS_API/to/1", String::class.java)
+      assertThat(response.statusCode).isEqualTo(HttpStatus.UNAUTHORIZED)
+    }
   }
 
   private fun getAuthHeaders(): HttpHeaders {

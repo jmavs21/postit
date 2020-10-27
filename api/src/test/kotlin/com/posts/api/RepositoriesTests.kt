@@ -67,4 +67,14 @@ class RepositoriesTests @Autowired constructor(
     val follow = followRepo.findAllByFromId(1).firstOrNull { it.to.id == to.id }
     assertThat(follow?.to?.id).isEqualTo(to.id)
   }
+
+  @Test
+  fun `when followRepo-findAllByToId with user then followers`() {
+    val from = userRepo.findByIdOrNull(5)
+    val to = userRepo.findByIdOrNull(1)
+    if (from == null || to == null) fail("users where not found.")
+    followRepo.save(Follow(from, to, FollowId(from.id, to.id)))
+    val follow = followRepo.findAllByToId(1).firstOrNull { it.from.id == from.id }
+    assertThat(follow?.from?.id).isEqualTo(from.id)
+  }
 }

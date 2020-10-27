@@ -6,7 +6,9 @@ import com.posts.api.repo.FollowRepo
 import com.posts.api.repo.PostRepo
 import com.posts.api.repo.UserRepo
 import com.posts.api.repo.VoteRepo
+import com.posts.api.web.PostDto
 import com.posts.api.web.PostSnippetDto
+import com.posts.api.web.toDto
 import com.posts.api.web.toSnippetDto
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -66,7 +68,12 @@ class PostService(
     return getPostsFeedForUser((authUser as User).id, postsFeed)
   }
 
-  fun findOne(id: Long): Post = getPostById(id)
+  @Transactional
+  fun findOne(id: Long, authUser: Any?): PostDto {
+    val post = getPostById(id)
+    if (authUser == null) return post.toDto()
+    return getPostForUser((authUser as User).id, post)
+  }
 
   fun create(post: Post): Post = postRepo.save(post)
 
@@ -136,6 +143,14 @@ class PostService(
 
   private fun getPostById(id: Long): Post = postRepo.findByIdOrNull(id)
     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found.")
+
+  private fun getPostForUser(userId: Long, post: Post): PostDto {
+    val postDto = post.toDto()
+    postDto.isFollow = followRepo.existsById(FollowId(userId, post.user.id))
+    val userVote = voteRepo.findByIdOrNull(VoteId(userId, post.id))
+    if (userVote != null) postDto.voteValue = userVote.value
+    return postDto
+  }
 }
 
 @Service
@@ -161,7 +176,6 @@ class FollowService(private val followRepo: FollowRepo, private val userRepo: Us
   @Transactional
   fun create(from: User, toId: Long): String {
     val to = userRepo.findByIdOrNull(toId)
-    println("fromId: ${from.id}, toId: ${to?.id}")
     if (to == null || from.id == to.id) return "Unchanged"
     val follow = followRepo.findAllByFromId(from.id).firstOrNull { it.to.id == to.id }
     return if (follow == null) {
@@ -172,4 +186,8 @@ class FollowService(private val followRepo: FollowRepo, private val userRepo: Us
       "Unfollowed"
     }
   }
+
+  fun findFollows(fromId: Long): List<Follow> = followRepo.findAllByFromId(fromId)
+
+  fun findFollowers(toId: Long): List<Follow> = followRepo.findAllByToId(toId)
 }

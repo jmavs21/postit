@@ -48,4 +48,6 @@ interface VoteRepo : CrudRepository<Vote, VoteId> {
 
 interface FollowRepo : CrudRepository<Follow, FollowId> {
   fun findAllByFromId(fromId: Long): List<Follow>
+
+  fun findAllByToId(toId: Long): List<Follow>
 }

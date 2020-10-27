@@ -2,11 +2,11 @@ import { Button } from '@chakra-ui/core';
 import React, { useState } from 'react';
 import { User } from '../services/authService';
 import { createFollow } from '../services/followService';
-import { PostSnippet } from '../services/postService';
+import { Post } from '../services/postService';
 
 interface FollowProps {
   changePostsFollows: (toId: number, isFollow: boolean) => void;
-  post: PostSnippet;
+  post: Post;
   from: User | null;
   toId: number;
 }

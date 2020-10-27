@@ -59,7 +59,7 @@ const updatePostWithoutImmer = (
     voteValue: number
   ) => {
     const postsResCopy: PostsRes = JSON.parse(JSON.stringify(postsRes));
-    const postCopy: PostSnippet | undefined = postsResCopy.posts.find(
+    const postCopy: Post | undefined = postsResCopy.posts.find(
       (p) => p.id === postId
     );
     if (postCopy === undefined) return;

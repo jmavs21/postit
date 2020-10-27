@@ -26,7 +26,7 @@ export const NavBar: React.FC = () => {
           </NavLink>
           <NavLink to="/posts/new">
             <IconButton
-              icon="edit"
+              icon="add"
               size="xs"
               ml={4}
               isRound={true}
@@ -47,7 +47,7 @@ export const NavBar: React.FC = () => {
               <Form style={{ width: '100%' }}>
                 <SearchField
                   name="searchText"
-                  placeholder="Search..."
+                  placeholder="Search"
                   colorMode={colorMode}
                 />
               </Form>

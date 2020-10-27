@@ -55,7 +55,7 @@ export const Login: React.FC<LoginProps> = ({ location }) => {
               mt={4}
               type="submit"
               isLoading={isSubmitting}
-              loadingText="Login..."
+              loadingText="Login"
             >
               Login
             </Button>
