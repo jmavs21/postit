@@ -33,7 +33,7 @@ export const Follow: React.FC<FollowProps> = ({
   return from?.id === toId ? null : (
     <Button
       onClick={callFollow}
-      mr={4}
+      mr={2}
       size="xs"
       variantColor="blue"
       variant={post.isFollow ? 'solid' : 'outline'}
