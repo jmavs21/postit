@@ -9,11 +9,13 @@ import { Votes } from './Votes';
 interface PostCardProps {
   p: Post;
   changePostsFollows: (toId: number, isFollow: boolean) => void | null;
+  isView?: boolean;
 }
 
 export const PostCard: React.FC<PostCardProps> = ({
   p,
   changePostsFollows,
+  isView,
 }) => {
   const { user } = useContext(UserContext);
   return (
@@ -21,11 +23,15 @@ export const PostCard: React.FC<PostCardProps> = ({
       <Flex>
         <Votes key={p.id} post={p} isUser={user !== null} />
         <Box mr="auto">
-          <Link as="header">
-            <NavLink to={'/posts/' + p.id}>
-              <Heading fontSize="xl">{p.title}</Heading>
-            </NavLink>
-          </Link>
+          {isView ? (
+            <Heading fontSize="xl">{p.title}</Heading>
+          ) : (
+            <Link as="header">
+              <NavLink to={'/posts/' + p.id}>
+                <Heading fontSize="xl">{p.title}</Heading>
+              </NavLink>
+            </Link>
+          )}
           <Flex mt={2}>
             <Follow
               key={p.id}

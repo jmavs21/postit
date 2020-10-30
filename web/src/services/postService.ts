@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { CreatePostValues } from '../components/pages/CreatePost';
 import { User } from './authService';
 import httpService from './httpService';
+import logger from './logService';
 
 const postsApi = '/posts';
 
@@ -35,7 +36,7 @@ export const getPosts = async (cursor: string, search: string) => {
     response.data = data;
   } catch (ex) {
     if (ex.response?.data) response.errors = ex.response.data;
-    else console.log('Error on fetching posts: ', ex);
+    else logger.log('Error on fetching posts: ' + ex);
   }
   return response;
 };
@@ -61,7 +62,7 @@ export const getPostById = async (postId: string) => {
     response.data = data;
   } catch (ex) {
     if (ex.response?.data) response.errors = ex.response.data;
-    else console.log('Error on fetching posts: ', ex);
+    else logger.log('Error on fetching posts: ' + ex);
   }
   return response;
 };
@@ -70,7 +71,7 @@ export const deletePostById = async (postId: number) => {
   try {
     await httpService.delete(`${postsApi}/${postId}`);
   } catch (ex) {
-    console.log('Error on fetching posts: ', ex);
+    logger.log('Error on fetching posts: ' + ex);
     return false;
   }
   return true;

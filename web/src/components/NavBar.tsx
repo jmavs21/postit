@@ -78,16 +78,19 @@ export const NavBar: React.FC = () => {
               <Text as="i" mr={2}>
                 <NavLink to="/profile">{user.name}</NavLink>
               </Text>
-              <Text>
-                <NavLink
-                  to="/logout"
+
+              <NavLink to="/logout">
+                <IconButton
+                  icon="close"
+                  size="xs"
+                  ml={2}
+                  isRound={true}
+                  aria-label="Logout"
                   onClick={() => {
                     if (setUser != null) setUser(null);
                   }}
-                >
-                  Logout
-                </NavLink>
-              </Text>
+                />
+              </NavLink>
             </>
           )}
         </Flex>

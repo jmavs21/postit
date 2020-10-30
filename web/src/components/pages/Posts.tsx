@@ -1,4 +1,4 @@
-import { Flex, Stack } from '@chakra-ui/core';
+import { Flex, Stack, useToast } from '@chakra-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Waypoint } from 'react-waypoint';
@@ -20,6 +20,7 @@ export const Posts: React.FC = () => {
     posts: [],
     hasMore: true,
   });
+  const toast = useToast();
 
   useEffect(() => {
     (async () => {
@@ -35,10 +36,17 @@ export const Posts: React.FC = () => {
           posts: [],
           hasMore: false,
         });
+        toast({
+          title: 'There was an error retrieving the posts.',
+          description: 'Please try again later.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
       }
       setIsLoading(false);
     })();
-  }, [search]);
+  }, [search, toast]);
 
   const loadMore = async () => {
     setIsLoading(true);
@@ -52,6 +60,11 @@ export const Posts: React.FC = () => {
       setPostsState({
         posts,
         hasMore: data.hasMore,
+      });
+    } else {
+      setPostsState({
+        ...postsState,
+        hasMore: false,
       });
     }
     setIsLoading(false);

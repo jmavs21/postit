@@ -43,7 +43,11 @@ export const PostView: React.FC<PostViewProps> = ({ ...props }) => {
         <LoadingProgress />
       ) : (
         <Box p={5} shadow="md" borderWidth="1px">
-          <PostCard p={post} changePostsFollows={changePostsFollows} />
+          <PostCard
+            p={post}
+            changePostsFollows={changePostsFollows}
+            isView={true}
+          />
         </Box>
       )}
     </Wrapper>
