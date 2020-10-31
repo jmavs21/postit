@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
+const val FOLLOWED = "Followed"
+const val UNFOLLOWED = "Unfollowed"
+
 @Service
 class UserService(
   private val userRepo: UserRepo,
@@ -180,10 +183,10 @@ class FollowService(private val followRepo: FollowRepo, private val userRepo: Us
     val follow = followRepo.findAllByFromId(from.id).firstOrNull { it.to.id == to.id }
     return if (follow == null) {
       followRepo.save(Follow(from, to, FollowId(from.id, to.id)))
-      "Followed"
+      FOLLOWED
     } else {
       followRepo.delete(follow)
-      "Unfollowed"
+      UNFOLLOWED
     }
   }
 

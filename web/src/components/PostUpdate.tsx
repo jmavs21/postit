@@ -2,6 +2,7 @@ import { Box, Flex, IconButton, Button, useToast } from '@chakra-ui/core';
 import { Formik, Form } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { History } from 'history';
 import {
   deletePostById,
   getPostById,
@@ -20,10 +21,12 @@ interface MatchParams {
 
 interface PostUpdateProps extends RouteComponentProps<MatchParams> {
   location: any;
+  history: History;
 }
 
 export const PostUpdate: React.FC<PostUpdateProps> = ({
   location,
+  history,
   ...props
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -84,12 +87,9 @@ export const PostUpdate: React.FC<PostUpdateProps> = ({
                 { title: post.title, text: post.text } as CreatePostValues
               }
               onSubmit={async (values, { setErrors }) => {
-                const { errors } = await updatePost(post.id, values);
-                if (errors) setErrors(errors);
-                else
-                  window.location.href = location.state
-                    ? location.state.from.pathname
-                    : '/';
+                const { data, errors } = await updatePost(post.id, values);
+                if (data) history.push(`/posts/${data.id}`);
+                else if (errors) setErrors(errors);
               }}
             >
               {({ isSubmitting }) => (

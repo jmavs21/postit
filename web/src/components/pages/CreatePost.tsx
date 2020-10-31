@@ -1,9 +1,9 @@
 import { Box, Button, Flex } from '@chakra-ui/core';
 import { Formik, Form } from 'formik';
 import React from 'react';
+import { History } from 'history';
 import { InputField } from '../InputField';
 import { Wrapper } from '../Wrapper';
-import { History } from 'history';
 import { createPost } from '../../services/postService';
 
 interface CreatePostProps {
@@ -23,9 +23,9 @@ export const CreatePost: React.FC<CreatePostProps> = ({ history }) => {
           <Formik
             initialValues={{ title: '', text: '' } as CreatePostValues}
             onSubmit={async (values, { setErrors }) => {
-              const { errors } = await createPost(values);
-              if (errors) setErrors(errors);
-              else history.push('/posts');
+              const { data, errors } = await createPost(values);
+              if (data) history.push(`/posts/${data.id}`);
+              else if (errors) setErrors(errors);
             }}
           >
             {({ isSubmitting }) => (

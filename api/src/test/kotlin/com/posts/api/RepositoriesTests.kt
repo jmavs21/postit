@@ -6,7 +6,6 @@ import com.posts.api.repo.PostRepo
 import com.posts.api.repo.UserRepo
 import com.posts.api.repo.VoteRepo
 import com.posts.api.web.POSTS_LIMIT
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -29,7 +28,7 @@ class RepositoriesTests @Autowired constructor(
     @Test
     fun `when findOneByEmail then user`() {
       val user = userRepo.findOneByEmail("bob@bob.com")
-      assertThat(user?.name).isEqualTo("Bob")
+      checkStringContains(user?.name, "Bob")
     }
   }
 
@@ -38,14 +37,14 @@ class RepositoriesTests @Autowired constructor(
     @Test
     fun `when findPostsFeed then post feed with limit`() {
       val postsFeed = postRepo.findPostsFeed(LocalDateTime.now(), PageRequest.of(0, POSTS_LIMIT))
-      assertThat(postsFeed.size).isEqualTo(POSTS_LIMIT)
+      checkIntEqual(postsFeed.size, POSTS_LIMIT)
     }
 
     @Test
     fun `when findPostsFeedSearch with word 'down' on title, text or user name then post feed with limit`() {
       val postsFeedSearch =
         postRepo.findPostsFeedSearch(LocalDateTime.now(), "down", PageRequest.of(0, POSTS_LIMIT))
-      assertThat(postsFeedSearch.size).isEqualTo(1)
+      checkIntEqual(postsFeedSearch.size, 1)
     }
   }
 
@@ -54,10 +53,11 @@ class RepositoriesTests @Autowired constructor(
     @Test
     fun `when findAllByUserId with up vote of post by user then votes`() {
       val (user, post) = getUserAndPost(1, 1)
-      upVotePost(user, post)
+      val vote = upVotePost(user, post)
       val votes = voteRepo.findAllByUserId(1)
-      assertThat(votes.size).isEqualTo(1)
-      assertThat(post.points).isEqualTo(63)
+      checkIntEqual(votes.size, 1)
+      checkIntEqual(post.points, 63)
+      downVotePost(post, vote)
     }
 
     private fun getUserAndPost(userId: Long, postId: Long): Pair<User, Post> {
@@ -67,10 +67,16 @@ class RepositoriesTests @Autowired constructor(
       return user to post
     }
 
-    private fun upVotePost(user: User, post: Post) {
+    private fun upVotePost(user: User, post: Post): Vote {
       post.points = post.points + 1
       postRepo.save(post)
-      voteRepo.save(Vote(1, user, post, VoteId(user.id, post.id)))
+      return voteRepo.save(Vote(1, user, post, VoteId(user.id, post.id)))
+    }
+
+    private fun downVotePost(post: Post, vote: Vote) {
+      post.points = post.points - 1
+      postRepo.save(post)
+      voteRepo.deleteById(vote.id)
     }
   }
 
@@ -79,18 +85,23 @@ class RepositoriesTests @Autowired constructor(
     @Test
     fun `when findAllByFromId with user then follows`() {
       val (from, to) = getFromAndToUsers(1, 2)
-      followRepo.save(Follow(from, to, FollowId(from.id, to.id)))
+      val following = createFollow(from, to)
       val follow = followRepo.findAllByFromId(1).firstOrNull { it.to.id == to.id }
-      assertThat(follow?.to?.id).isEqualTo(to.id)
+      checkLongEqual(follow?.to?.id, to.id)
+      removeFollow(following.id)
     }
 
     @Test
     fun `when findAllByToId with user then followers`() {
       val (from, to) = getFromAndToUsers(5, 1)
-      followRepo.save(Follow(from, to, FollowId(from.id, to.id)))
+      val follower = createFollow(from, to)
       val follow = followRepo.findAllByToId(1).firstOrNull { it.from.id == from.id }
-      assertThat(follow?.from?.id).isEqualTo(from.id)
+      checkLongEqual(follow?.from?.id, from.id)
+      removeFollow(follower.id)
     }
+
+    private fun createFollow(from: User, to: User): Follow =
+      followRepo.save(Follow(from, to, FollowId(from.id, to.id)))
 
     private fun getFromAndToUsers(fromId: Long, toId: Long): Pair<User, User> {
       val from = userRepo.findByIdOrNull(fromId)
@@ -98,5 +109,7 @@ class RepositoriesTests @Autowired constructor(
       if (from == null || to == null) fail("users where not found.")
       return from to to
     }
+
+    private fun removeFollow(followId: FollowId) = followRepo.deleteById(followId)
   }
 }

@@ -9,11 +9,11 @@ import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Configuration
 @EnableSwagger2
-class SpringFoxConfig {
+class SwaggerConfig {
 
   @Bean
   fun api(): Docket =
@@ -22,6 +22,6 @@ class SpringFoxConfig {
       .select()
       .apis(RequestHandlerSelectors.basePackage("com.posts.api.web"))
       .paths(PathSelectors.any()).build()
-      .directModelSubstitute(LocalDate::class.java, String::class.java)
+      .directModelSubstitute(LocalDateTime::class.java, String::class.java)
       .genericModelSubstitutes(ResponseEntity::class.java)
 }

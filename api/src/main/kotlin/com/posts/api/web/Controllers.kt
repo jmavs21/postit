@@ -17,13 +17,14 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
+import java.net.URI
 import javax.validation.Valid
 
-const val AUTH_API: String = "/api/auth"
-const val USERS_API: String = "/api/users"
-const val POSTS_API: String = "/api/posts"
-const val VOTES_API: String = "/api/votes"
-const val FOLLOWS_API: String = "/api/follows"
+const val AUTH_API = "/api/auth"
+const val USERS_API = "/api/users"
+const val POSTS_API = "/api/posts"
+const val VOTES_API = "/api/votes"
+const val FOLLOWS_API = "/api/follows"
 const val POSTS_LIMIT = 20
 
 @RestController
@@ -64,7 +65,7 @@ class UserController(
   fun create(@Valid @RequestBody newUserCreate: UserCreateDtoReq): ResponseEntity<UserDto> {
     val user = userService.create(newUserCreate.toEntity())
     val headers = getHeadersWithToken(user)
-    return ResponseEntity.ok().headers(headers).body(user.toDto())
+    return ResponseEntity.created(URI("$USERS_API/${user.id}")).headers(headers).body(user.toDto())
   }
 
   @PutMapping("/{id}")
@@ -108,8 +109,13 @@ class PostController(private val postService: PostService) {
 
   @PostMapping
   @ResponseStatus(CREATED)
-  fun create(@Valid @RequestBody newPost: PostDtoReq, auth: Authentication): PostDto =
-    postService.create(newPost.toEntity(auth.principal as User)).toDto()
+  fun create(
+    @Valid @RequestBody newPost: PostDtoReq,
+    auth: Authentication,
+  ): ResponseEntity<PostDto> {
+    val post = postService.create(newPost.toEntity(auth.principal as User))
+    return ResponseEntity.created(URI("$POSTS_API/${post.id}")).body(post.toDto())
+  }
 
   @PutMapping("/{id}")
   fun update(
