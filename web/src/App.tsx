@@ -11,14 +11,14 @@ import { Posts } from './components/pages/Posts';
 import { NotFound } from './components/pages/NotFound';
 import { Login } from './components/pages/Login';
 import { NavBar } from './components/NavBar';
-import { Logout } from './components/Logout';
+import { Logout } from './components/pages/Logout';
 import { UserContext } from './utils/UserContext';
 import { getUserFromJwt } from './services/authService';
 import { Profile } from './components/pages/Profile';
 import { CreatePost } from './components/pages/CreatePost';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PostView } from './components/pages/PostView';
-import { PostUpdate } from './components/PostUpdate';
+import { PostUpdate } from './components/pages/PostUpdate';
 
 const App: React.FC = () => {
   const [user, setUser] = useState(() => getUserFromJwt());
