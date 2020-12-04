@@ -1,6 +1,6 @@
 # Posts
 
-A posts web application.
+A web application for posting messages.
 
 - Link to [demo](https://limitless-refuge-35645.herokuapp.com/posts)
 
@@ -31,7 +31,7 @@ A posts web application.
 - Kotlin
 - Spring Boot
 
-## Installation and usage instructions
+## Installation
 
 - Clone repo
 
@@ -39,5 +39,5 @@ A posts web application.
 git clone https://github.com/jmavs21/posts.git
 ```
 
-- Continue for [WEB](https://github.com/jmavs21/posts/tree/master/web)
-- Continue for [API](https://github.com/jmavs21/posts/tree/master/api)
+- Continue for [Web](https://github.com/jmavs21/posts/tree/master/web)
+- Continue for [Api](https://github.com/jmavs21/posts/tree/master/api)

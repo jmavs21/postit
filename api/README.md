@@ -1,29 +1,37 @@
-### API
+## API
 
-## Technologies used
+### Technologies used
+
 - Kotlin
 - Spring Boot
   - Spring Web
   - Spring Data JPA
-  - Spring Security with JWT
+  - Spring Security
   - Spring Validation
 - H2 Database
 - Java JWT
 - Swagger
 
-## Installation
+### Installation
+
 - Go into project
+
 ```sh
 cd /api
 ```
+
 - Build
+
 ```sh
 ./gradlew build
 ```
+
 - Run
+
 ```sh
 ./gradlew bootRun
 ```
 
-## Usage
-By using [Swagger](http://localhost:4000/swagger-ui.html#/)
+### API documentation
+
+- Via [Swagger](http://localhost:4000/swagger-ui.html#/)

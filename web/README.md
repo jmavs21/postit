@@ -1,6 +1,6 @@
-### Web
+## Web
 
-## Technologies used
+### Technologies used
 
 - TypeScript
 - React
@@ -11,7 +11,7 @@
 - JWT decode
 - React Waypoint
 
-## Installation
+### Installation
 
 - Go into project
 
