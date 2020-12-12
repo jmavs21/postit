@@ -6,10 +6,6 @@ import com.posts.api.repo.FollowRepo
 import com.posts.api.repo.PostRepo
 import com.posts.api.repo.UserRepo
 import com.posts.api.repo.VoteRepo
-import com.posts.api.web.PostDto
-import com.posts.api.web.PostSnippetDto
-import com.posts.api.web.toDto
-import com.posts.api.web.toSnippetDto
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -65,16 +61,16 @@ class PostService(
   private val followRepo: FollowRepo,
 ) {
   @Transactional
-  fun findAll(createdat: String, search: String, authUser: Any?, limit: Int): List<PostSnippetDto> {
-    val postsFeed = getPostsFeed(getDateFromCursor(createdat), search, PageRequest.of(0, limit))
-    if (authUser == null) return postsFeed.toList().map { it.toSnippetDto() }
-    return getPostsFeedForUser((authUser as User).id, postsFeed)
+  fun findAll(createdat: String, search: String, authUser: Any?, limit: Int): List<Post> {
+    val posts = getPosts(getDateFromCursor(createdat), search, PageRequest.of(0, limit))
+    if (authUser == null) return posts
+    return getPostsForUser((authUser as User).id, posts)
   }
 
   @Transactional
-  fun findOne(id: Long, authUser: Any?): PostDto {
+  fun findOne(id: Long, authUser: Any?): Post {
     val post = getPostById(id)
-    if (authUser == null) return post.toDto()
+    if (authUser == null) return post
     return getPostForUser((authUser as User).id, post)
   }
 
@@ -102,34 +98,28 @@ class PostService(
     postRepo.deleteById(post.id)
   }
 
-  private fun getPostsFeed(
+  private fun getPosts(
     cursorDate: LocalDateTime,
     search: String,
     limit: PageRequest,
-  ): List<Post> =
-    if (search.isBlank()) postRepo.findPostsFeed(
-      cursorDate,
-      limit
-    ) else postRepo.findPostsFeedSearch(
-      cursorDate,
-      search,
-      limit
-    )
+  ): List<Post> {
+    if (search.isBlank()) return postRepo.findPosts(cursorDate, limit)
+    return postRepo.findPostsSearch(cursorDate, search, limit)
+  }
 
   private fun getDateFromCursor(createdat: String) =
     if (createdat.isBlank()) LocalDateTime.now() else LocalDateTime.parse(createdat)
 
-  private fun getPostsFeedForUser(
+  private fun getPostsForUser(
     userId: Long,
-    postsFeed: List<Post>,
-  ): List<PostSnippetDto> {
+    posts: List<Post>,
+  ): List<Post> {
     val followees = getFollowees(userId)
     val postIdToValue = getMapOfUserPostsVotes(userId)
-    return postsFeed.map { post ->
-      val postDto = post.toSnippetDto()
-      if (post.user.id in followees) postDto.isFollow = true
-      if (postDto.id in postIdToValue) postDto.voteValue = postIdToValue.getValue(postDto.id)
-      postDto
+    return posts.map { post ->
+      if (post.user.id in followees) post.isFollow = true
+      if (post.id in postIdToValue) post.voteValue = postIdToValue.getValue(post.id)
+      post
     }
   }
 
@@ -147,12 +137,11 @@ class PostService(
   private fun getPostById(id: Long): Post = postRepo.findByIdOrNull(id)
     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found.")
 
-  private fun getPostForUser(userId: Long, post: Post): PostDto {
-    val postDto = post.toDto()
-    postDto.isFollow = followRepo.existsById(FollowId(userId, post.user.id))
+  private fun getPostForUser(userId: Long, post: Post): Post {
+    post.isFollow = followRepo.existsById(FollowId(userId, post.user.id))
     val userVote = voteRepo.findByIdOrNull(VoteId(userId, post.id))
-    if (userVote != null) postDto.voteValue = userVote.value
-    return postDto
+    if (userVote != null) post.voteValue = userVote.value
+    return post
   }
 }
 

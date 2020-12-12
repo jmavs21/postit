@@ -13,7 +13,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.util.MultiValueMap
 
 const val TOTAL_USERS = 30
 const val TOTAL_POSTS = 100
@@ -172,7 +171,7 @@ class ControllersTests {
   inner class PostsControllerTests {
     @Test
     fun `when POSTS_API GET with defaults cursor and search and valid headers then posts and 200`() {
-      val response = doGet<PostsDto>("$POSTS_API/?cursor=&search=")
+      val response = doGet<PostFeedDto>("$POSTS_API/?cursor=&search=")
       check200(response.statusCode)
       checkIntEqual(response.body?.posts?.count(), POSTS_LIMIT)
       checkStringContains(response.body?.posts?.first()?.title,
@@ -181,7 +180,7 @@ class ControllersTests {
 
     @Test
     fun `when POSTS_API GET with date cursor and default search and valid headers then posts and 200`() {
-      val response = doGet<PostsDto>("$POSTS_API/?cursor=2020-06-19T20:42:44&search=")
+      val response = doGet<PostFeedDto>("$POSTS_API/?cursor=2020-06-19T20:42:44&search=")
       check200(response.statusCode)
       checkIntEqual(response.body?.posts?.count(), POSTS_LIMIT)
       checkStringContains(response.body?.posts?.first()?.title, "Distributed asymmetric structure")
@@ -189,7 +188,7 @@ class ControllersTests {
 
     @Test
     fun `when POSTS_API GET with default cursor and a search and valid headers then post and 200`() {
-      val response = doGet<PostsDto>("$POSTS_API/?cursor=&search=down")
+      val response = doGet<PostFeedDto>("$POSTS_API/?cursor=&search=down")
       check200(response.statusCode)
       checkIntEqual(response.body?.posts?.count(), 1)
       checkStringContains(response.body?.posts?.first()?.title,
@@ -199,7 +198,7 @@ class ControllersTests {
     @Test
     fun `when POSTS_API GET with cursor and search and valid headers then post and 200`() {
       val response =
-        doGet<PostsDto>("$POSTS_API/?cursor=2020-06-19T20:42:44&search=Distributed asymmetric structure")
+        doGet<PostFeedDto>("$POSTS_API/?cursor=2020-06-19T20:42:44&search=Distributed asymmetric structure")
       check200(response.statusCode)
       checkIntEqual(response.body?.posts?.count(), 1)
       checkStringContains(response.body?.posts?.first()?.title, "Distributed asymmetric structure")

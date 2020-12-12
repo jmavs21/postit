@@ -98,14 +98,15 @@ class PostController(private val postService: PostService) {
     @RequestParam cursor: String,
     @RequestParam search: String,
     @AuthenticationPrincipal user: User?,
-  ): PostsDto {
+  ): PostFeedDto {
     val posts = postService.findAll(cursor, search, user, POSTS_LIMIT + 1)
-    return PostsDto(posts.take(POSTS_LIMIT), posts.size == POSTS_LIMIT + 1)
+    return PostFeedDto(posts.toList().map { it.toSnippetDto() }.take(POSTS_LIMIT),
+      posts.size == POSTS_LIMIT + 1)
   }
 
   @GetMapping("/{id}")
   fun findOne(@PathVariable id: Long, @AuthenticationPrincipal user: User?): PostDto =
-    postService.findOne(id, user)
+    postService.findOne(id, user).toDto()
 
   @PostMapping
   @ResponseStatus(CREATED)

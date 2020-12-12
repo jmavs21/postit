@@ -6,6 +6,8 @@ import com.posts.api.model.User
 import java.time.LocalDateTime
 import javax.validation.constraints.Size
 
+const val TEXT_SNIPPET_SIZE = 200
+
 data class AuthDtoReq(
   @field:Size(min = 1, max = 50)
   val email: String,
@@ -64,20 +66,8 @@ data class UserDto(
 
 fun User.toDto() = UserDto(name, email, createdat, updatedat, id)
 
-data class PostSnippetDto(
-  var title: String,
-  var text: String,
-  var points: Int,
-  var voteValue: Int,
-  var isFollow: Boolean,
-  var user: UserDto,
-  var createdat: LocalDateTime?,
-  var updatedat: LocalDateTime?,
-  var id: Long,
-)
-
-data class PostsDto(
-  var posts: Iterable<PostSnippetDto>,
+data class PostFeedDto(
+  var posts: Iterable<PostDto>,
   var hasMore: Boolean,
 )
 
@@ -93,14 +83,15 @@ data class PostDto(
   var id: Long?,
 )
 
-fun Post.toDto() = PostDto(title, text, points, 0, false, user.toDto(), createdat, updatedat, id)
+fun Post.toDto() =
+  PostDto(title, text, points, voteValue, isFollow, user.toDto(), createdat, updatedat, id)
 
-fun Post.toSnippetDto() = PostSnippetDto(
+fun Post.toSnippetDto() = PostDto(
   title,
-  "${text.substring(0, minOf(text.length, 200))}...",
+  getTextSnippet(text),
   points,
-  0,
-  false,
+  voteValue,
+  isFollow,
   user.toDto(),
   createdat,
   updatedat,
@@ -119,3 +110,8 @@ data class FollowCreateDtoReq(
 fun Follow.toDto() = to.toDto()
 
 fun Follow.toDtoFrom() = from.toDto()
+
+private fun getTextSnippet(text: String): String {
+  if (text.length <= TEXT_SNIPPET_SIZE) return text
+  return "${text.substring(0, TEXT_SNIPPET_SIZE)}..."
+}

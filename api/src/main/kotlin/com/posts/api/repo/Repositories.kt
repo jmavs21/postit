@@ -21,7 +21,7 @@ interface PostRepo : PagingAndSortingRepository<Post, Long> {
     WHERE p.createdat < :createdat
     ORDER BY p.createdat DESC
   """)
-  fun findPostsFeed(@Param("createdat") createdat: LocalDateTime, pageable: Pageable): List<Post>
+  fun findPosts(@Param("createdat") createdat: LocalDateTime, pageable: Pageable): List<Post>
 
   @Query(value = """
     SELECT p, u 
@@ -35,7 +35,7 @@ interface PostRepo : PagingAndSortingRepository<Post, Long> {
       ) 
     ORDER BY p.createdat DESC
   """)
-  fun findPostsFeedSearch(
+  fun findPostsSearch(
     @Param("createdat") createdat: LocalDateTime,
     @Param("search") search: String,
     pageable: Pageable,

@@ -35,16 +35,16 @@ class RepositoriesTests @Autowired constructor(
   @Nested
   inner class PostRepoTests {
     @Test
-    fun `when findPostsFeed then post feed with limit`() {
-      val postsFeed = postRepo.findPostsFeed(LocalDateTime.now(), PageRequest.of(0, POSTS_LIMIT))
-      checkIntEqual(postsFeed.size, POSTS_LIMIT)
+    fun `when findPosts then posts with limit`() {
+      val posts = postRepo.findPosts(LocalDateTime.now(), PageRequest.of(0, POSTS_LIMIT))
+      checkIntEqual(posts.size, POSTS_LIMIT)
     }
 
     @Test
-    fun `when findPostsFeedSearch with word 'down' on title, text or user name then post feed with limit`() {
-      val postsFeedSearch =
-        postRepo.findPostsFeedSearch(LocalDateTime.now(), "down", PageRequest.of(0, POSTS_LIMIT))
-      checkIntEqual(postsFeedSearch.size, 1)
+    fun `when findPostsSearch with word 'down' on title, text or user name then posts with limit`() {
+      val postsSearch =
+        postRepo.findPostsSearch(LocalDateTime.now(), "down", PageRequest.of(0, POSTS_LIMIT))
+      checkIntEqual(postsSearch.size, 1)
     }
   }
 

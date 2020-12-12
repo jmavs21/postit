@@ -34,6 +34,12 @@ class Post(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Long = 0,
+
+  @Transient
+  var voteValue: Int = 0,
+
+  @Transient
+  var isFollow: Boolean = false,
 )
 
 @Entity
@@ -106,7 +112,7 @@ class User : UserDetails {
   @Column(nullable = false)
   var updatedat: LocalDateTime = LocalDateTime.now()
 
-  override fun getAuthorities(): Collection<GrantedAuthority?>? = ArrayList()
+  override fun getAuthorities(): Collection<GrantedAuthority?> = ArrayList()
 
   override fun isEnabled(): Boolean = true
 
