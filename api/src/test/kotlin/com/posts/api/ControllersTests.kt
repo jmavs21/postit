@@ -1,8 +1,8 @@
 package com.posts.api
 
 import com.posts.api.conf.X_AUTH_TOKE
-import com.posts.api.service.FOLLOWED
-import com.posts.api.service.UNFOLLOWED
+import com.posts.api.follows.FOLLOWED
+import com.posts.api.follows.UNFOLLOWED
 import com.posts.api.web.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

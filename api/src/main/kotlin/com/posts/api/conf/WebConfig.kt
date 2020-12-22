@@ -1,8 +1,8 @@
 package com.posts.api.conf
 
 import com.posts.api.error.ErrorFieldException
-import com.posts.api.model.User
-import com.posts.api.repo.UserRepo
+import com.posts.api.users.User
+import com.posts.api.users.UserRepo
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts

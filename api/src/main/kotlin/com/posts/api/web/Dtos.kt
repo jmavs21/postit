@@ -1,8 +1,8 @@
 package com.posts.api.web
 
-import com.posts.api.model.Follow
-import com.posts.api.model.Post
-import com.posts.api.model.User
+import com.posts.api.follows.Follow
+import com.posts.api.posts.Post
+import com.posts.api.users.User
 import java.time.LocalDateTime
 import javax.validation.constraints.Size
 

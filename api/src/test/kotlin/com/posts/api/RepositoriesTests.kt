@@ -1,10 +1,15 @@
 package com.posts.api
 
-import com.posts.api.model.*
-import com.posts.api.repo.FollowRepo
-import com.posts.api.repo.PostRepo
-import com.posts.api.repo.UserRepo
-import com.posts.api.repo.VoteRepo
+import com.posts.api.follows.Follow
+import com.posts.api.follows.FollowId
+import com.posts.api.follows.FollowRepo
+import com.posts.api.posts.Post
+import com.posts.api.posts.PostRepo
+import com.posts.api.users.User
+import com.posts.api.users.UserRepo
+import com.posts.api.votes.Vote
+import com.posts.api.votes.VoteId
+import com.posts.api.votes.VoteRepo
 import com.posts.api.web.POSTS_LIMIT
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

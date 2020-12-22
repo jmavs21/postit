@@ -3,11 +3,11 @@ package com.posts.api.web
 import com.posts.api.conf.JwtTokenUtil
 import com.posts.api.conf.X_AUTH_TOKE
 import com.posts.api.error.ErrorFieldException
-import com.posts.api.model.User
-import com.posts.api.service.FollowService
-import com.posts.api.service.PostService
-import com.posts.api.service.UserService
-import com.posts.api.service.VoteService
+import com.posts.api.follows.FollowService
+import com.posts.api.posts.PostService
+import com.posts.api.users.User
+import com.posts.api.users.UserService
+import com.posts.api.votes.VoteService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED

@@ -1,58 +1,17 @@
-package com.posts.api.service
+package com.posts.api.posts
 
-import com.posts.api.error.ErrorFieldException
-import com.posts.api.model.*
-import com.posts.api.repo.FollowRepo
-import com.posts.api.repo.PostRepo
-import com.posts.api.repo.UserRepo
-import com.posts.api.repo.VoteRepo
+import com.posts.api.follows.FollowId
+import com.posts.api.follows.FollowRepo
+import com.posts.api.users.User
+import com.posts.api.votes.VoteId
+import com.posts.api.votes.VoteRepo
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
-
-const val FOLLOWED = "Followed"
-const val UNFOLLOWED = "Unfollowed"
-
-@Service
-class UserService(
-  private val userRepo: UserRepo,
-  private val passwordEncoder: PasswordEncoder,
-) {
-  fun findAll(): Iterable<User> = userRepo.findAll()
-
-  fun findOne(id: Long): User = getUserById(id)
-
-  fun create(user: User): User {
-    if (userRepo.findOneByEmail(user.email) != null) throw ErrorFieldException(hashMapOf("email" to "the email already exists"),
-      HttpStatus.BAD_REQUEST)
-    user.password = passwordEncoder.encode(user.password)
-    return userRepo.save(user)
-  }
-
-  fun update(id: Long, updatedUser: User): User {
-    val user = getUserById(id).apply {
-      name = updatedUser.name
-      updatedat = LocalDateTime.now()
-    }
-    return userRepo.save(user)
-  }
-
-  fun delete(id: Long) = userRepo.deleteById(getUserById(id).id)
-
-  fun getUserByEmail(email: String): User = userRepo.findOneByEmail(email)
-    ?: throw ErrorFieldException(
-      hashMapOf("email" to "the email doesn't exists"),
-      HttpStatus.BAD_REQUEST
-    )
-
-  private fun getUserById(id: Long): User = userRepo.findByIdOrNull(id)
-    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User with id not found.")
-}
 
 @Service
 class PostService(
@@ -143,43 +102,4 @@ class PostService(
     if (userVote != null) post.voteValue = userVote.value
     return post
   }
-}
-
-@Service
-class VoteService(private val voteRepo: VoteRepo, private val postRepo: PostRepo) {
-  @Transactional
-  fun create(isUpVote: Boolean, postId: Long, user: User): Int {
-    val post = postRepo.findByIdOrNull(postId) ?: return 0
-    val voteValue = if (isUpVote) 1 else -1
-    val lastVote = voteRepo.findByIdOrNull(VoteId(user.id, postId))
-    when {
-      lastVote == null -> post.points = post.points + voteValue
-      lastVote.value != voteValue -> post.points = post.points + (2 * voteValue)
-      else -> return post.points
-    }
-    postRepo.save(post)
-    voteRepo.save(Vote(voteValue, user, post, VoteId(user.id, postId)))
-    return post.points
-  }
-}
-
-@Service
-class FollowService(private val followRepo: FollowRepo, private val userRepo: UserRepo) {
-  @Transactional
-  fun create(from: User, toId: Long): String {
-    val to = userRepo.findByIdOrNull(toId)
-    if (to == null || from.id == to.id) return "Unchanged"
-    val follow = followRepo.findAllByFromId(from.id).firstOrNull { it.to.id == to.id }
-    return if (follow == null) {
-      followRepo.save(Follow(from, to, FollowId(from.id, to.id)))
-      FOLLOWED
-    } else {
-      followRepo.delete(follow)
-      UNFOLLOWED
-    }
-  }
-
-  fun findFollows(fromId: Long): List<Follow> = followRepo.findAllByFromId(fromId)
-
-  fun findFollowers(toId: Long): List<Follow> = followRepo.findAllByToId(toId)
 }
