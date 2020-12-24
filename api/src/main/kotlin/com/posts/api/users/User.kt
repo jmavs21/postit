@@ -8,6 +8,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "users")
 class User : UserDetails {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(nullable = false, updatable = false)
@@ -23,10 +24,10 @@ class User : UserDetails {
   var email: String = ""
 
   @Column(nullable = false)
-  var createdat: LocalDateTime = LocalDateTime.now()
+  var createdate: LocalDateTime = LocalDateTime.now()
 
   @Column(nullable = false)
-  var updatedat: LocalDateTime = LocalDateTime.now()
+  var updatedate: LocalDateTime = LocalDateTime.now()
 
   override fun getAuthorities(): Collection<GrantedAuthority?> = ArrayList()
 

@@ -18,8 +18,8 @@ export interface Post {
   voteValue: number;
   points: number;
   user: User;
-  createdat: string;
-  udpatedat: string;
+  createdate: string;
+  updatedate: string;
   isFollow: boolean;
 }
 

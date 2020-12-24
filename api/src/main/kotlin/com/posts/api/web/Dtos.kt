@@ -26,6 +26,7 @@ data class UserCreateDtoReq(
   @field:Size(min = 1, max = 50)
   val password: String,
 ) {
+
   fun toEntity(): User {
     return User().apply {
       name = this@UserCreateDtoReq.name
@@ -39,6 +40,7 @@ data class UserUpdateDtoReq(
   @field:Size(min = 1, max = 50)
   val name: String,
 ) {
+
   fun toEntity(): User {
     return User().apply { name = this@UserUpdateDtoReq.name }
   }
@@ -51,6 +53,7 @@ data class PostDtoReq(
   @field:Size(min = 1, max = 500)
   val text: String,
 ) {
+
   fun toEntity(user: User): Post {
     return Post(title, text, user)
   }
@@ -59,12 +62,12 @@ data class PostDtoReq(
 data class UserDto(
   var name: String,
   var email: String,
-  var createdat: LocalDateTime?,
-  var updatedat: LocalDateTime?,
+  var createdate: LocalDateTime?,
+  var updatedate: LocalDateTime?,
   var id: Long?,
 )
 
-fun User.toDto() = UserDto(name, email, createdat, updatedat, id)
+fun User.toDto() = UserDto(name, email, createdate, updatedate, id)
 
 data class PostFeedDto(
   var posts: Iterable<PostDto>,
@@ -78,13 +81,13 @@ data class PostDto(
   var voteValue: Int,
   var isFollow: Boolean,
   var user: UserDto,
-  var createdat: LocalDateTime?,
-  var updatedat: LocalDateTime?,
+  var createdate: LocalDateTime?,
+  var updatedate: LocalDateTime?,
   var id: Long?,
 )
 
 fun Post.toDto() =
-  PostDto(title, text, points, voteValue, isFollow, user.toDto(), createdat, updatedat, id)
+  PostDto(title, text, points, voteValue, isFollow, user.toDto(), createdate, updatedate, id)
 
 fun Post.toSnippetDto() = PostDto(
   title,
@@ -93,8 +96,8 @@ fun Post.toSnippetDto() = PostDto(
   voteValue,
   isFollow,
   user.toDto(),
-  createdat,
-  updatedat,
+  createdate,
+  updatedate,
   id
 )
 

@@ -363,10 +363,9 @@ class ControllersTests {
     }
 
     @Test
-    fun `when VOTES_API POST with invalid postId but valid headers then 0 and 201`() {
+    fun `when VOTES_API POST with invalid postId but valid headers then 404`() {
       val response = doExchange<String>(VOTES_API, HttpMethod.POST, VoteCreateDtoReq(0, true), true)
-      check201(response.statusCode)
-      checkStringContains(response.body, "0")
+      check404(response.statusCode)
     }
   }
 

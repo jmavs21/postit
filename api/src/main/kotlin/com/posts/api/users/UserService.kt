@@ -3,29 +3,26 @@ package com.posts.api.users
 import com.posts.api.error.DataNotFoundException
 import com.posts.api.error.FieldException
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class UserService(
-  private val userRepo: UserRepo,
-  private val passwordEncoder: PasswordEncoder,
-) {
+class UserService(private val userRepo: UserRepo) {
+
   fun findAll(): Iterable<User> = userRepo.findAll()
 
   fun findOne(id: Long): User = getUserById(id)
 
-  fun create(user: User): User {
+  fun create(user: User, encodedPassword: String): User {
     if (userRepo.findOneByEmail(user.email) != null) throw FieldException(hashMapOf("email" to "the email already exists"))
-    user.password = passwordEncoder.encode(user.password)
+    user.password = encodedPassword
     return userRepo.save(user)
   }
 
   fun update(id: Long, updatedUser: User): User {
     val user = getUserById(id).apply {
       name = updatedUser.name
-      updatedat = LocalDateTime.now()
+      updatedate = LocalDateTime.now()
     }
     return userRepo.save(user)
   }

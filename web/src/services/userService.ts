@@ -10,8 +10,8 @@ interface UserResponse {
   id: number;
   email: string;
   name: string;
-  createdat: string;
-  udpatedat: string;
+  createdate: string;
+  updatedate: string;
 }
 
 interface Response {

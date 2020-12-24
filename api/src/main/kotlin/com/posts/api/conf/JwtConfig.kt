@@ -81,6 +81,7 @@ class JwtTokenUtil(
   @Value("\${jwt.expiration.millis}")
   val jwtExpirationMillis: String,
 ) {
+
   fun getUsernameFromToken(token: String): String = getAllClaimsFromToken(token).subject
 
   fun generateToken(user: User): String =

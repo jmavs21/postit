@@ -9,6 +9,11 @@ const val UNFOLLOWED = "Unfollowed"
 
 @Service
 class FollowService(private val followRepo: FollowRepo) {
+
+  fun findAllByFromId(userId: Long): List<Follow> = followRepo.findAllByFromId(userId)
+
+  fun existsById(followId: FollowId): Boolean = followRepo.existsById(followId)
+
   @Transactional
   fun create(from: User, to: User): String {
     if (from.id == to.id) return "Unchanged"

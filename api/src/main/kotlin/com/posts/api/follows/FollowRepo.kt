@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
 interface FollowRepo : CrudRepository<Follow, FollowId> {
+
   @Query(value = """
     SELECT f, u
     FROM Follow f

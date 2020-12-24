@@ -73,8 +73,8 @@ export const Posts: React.FC = () => {
   const getLastDate = (posts: Post[]) => {
     if (posts.length === 0) return '';
     return posts.reduce((p1, p2) =>
-      new Date(p1.createdat) < new Date(p2.createdat) ? p1 : p2
-    ).createdat;
+      new Date(p1.createdate) < new Date(p2.createdate) ? p1 : p2
+    ).createdate;
   };
 
   const getPostsCopy = () => {

@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
@@ -37,9 +38,12 @@ class WebSecurityConfig(
   val jwtRequestFilter: JwtRequestFilter,
 ) : WebSecurityConfigurerAdapter() {
 
+  @Bean
+  fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+
   @Autowired
-  fun configureGlobal(auth: AuthenticationManagerBuilder, passwordEncoder: PasswordEncoder) {
-    auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder)
+  fun configureGlobal(auth: AuthenticationManagerBuilder) {
+    auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder())
   }
 
   override fun configure(httpSecurity: HttpSecurity) {
@@ -79,6 +83,7 @@ class WebSecurityConfig(
  */
 @Component
 class MyAuthenticationEntryPoint : AuthenticationEntryPoint {
+
   override fun commence(
     request: HttpServletRequest?, response: HttpServletResponse,
     authException: AuthenticationException?,
@@ -90,5 +95,6 @@ class MyAuthenticationEntryPoint : AuthenticationEntryPoint {
  */
 @Service
 class MyUserDetailsService(val userService: UserService) : UserDetailsService {
+
   override fun loadUserByUsername(email: String): UserDetails = userService.getUserByEmail(email)
 }
