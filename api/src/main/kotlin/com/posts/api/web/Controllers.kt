@@ -1,15 +1,14 @@
 package com.posts.api.web
 
 import com.posts.api.conf.JwtTokenUtil
-import com.posts.api.conf.X_AUTH_TOKE
-import com.posts.api.error.ErrorFieldException
+import com.posts.api.conf.X_AUTH_TOKEN
+import com.posts.api.error.FieldException
 import com.posts.api.follows.FollowService
 import com.posts.api.posts.PostService
 import com.posts.api.users.User
 import com.posts.api.users.UserService
 import com.posts.api.votes.VoteService
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.ResponseEntity
@@ -37,10 +36,9 @@ class AuthController(
   @PostMapping
   fun create(@Valid @RequestBody authDtoReq: AuthDtoReq): String {
     val user = userService.getUserByEmail(authDtoReq.email)
-    if (!passwordEncoder.matches(authDtoReq.password, user.password)) throw ErrorFieldException(
-      hashMapOf("password" to "incorrect email or password"),
-      HttpStatus.BAD_REQUEST
-    )
+    if (!passwordEncoder.matches(authDtoReq.password,
+        user.password)
+    ) throw FieldException(hashMapOf("password" to "incorrect email or password"))
     return jwtTokenUtil.generateToken(user)
   }
 }
@@ -84,8 +82,8 @@ class UserController(
 
   private fun getHeadersWithToken(user: User): HttpHeaders {
     val headers = HttpHeaders()
-    headers.set(X_AUTH_TOKE, jwtTokenUtil.generateToken(user))
-    headers.set("access-control-expose-headers", X_AUTH_TOKE)
+    headers.set(X_AUTH_TOKEN, jwtTokenUtil.generateToken(user))
+    headers.set("access-control-expose-headers", X_AUTH_TOKEN)
     return headers
   }
 }
@@ -142,11 +140,14 @@ class VoteController(private val voteService: VoteService) {
 
 @RestController
 @RequestMapping(FOLLOWS_API)
-class FollowController(private val followService: FollowService) {
+class FollowController(
+  private val followService: FollowService,
+  private val userService: UserService,
+) {
   @PostMapping
   @ResponseStatus(CREATED)
   fun create(@Valid @RequestBody newFollow: FollowCreateDtoReq, auth: Authentication): String =
-    followService.create(auth.principal as User, newFollow.toId)
+    followService.create(auth.principal as User, userService.findOne(newFollow.toId))
 
   @GetMapping("/{id}")
   fun findFollows(@PathVariable id: Long): List<UserDto> =

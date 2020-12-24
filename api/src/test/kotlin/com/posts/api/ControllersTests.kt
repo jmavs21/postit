@@ -1,6 +1,6 @@
 package com.posts.api
 
-import com.posts.api.conf.X_AUTH_TOKE
+import com.posts.api.conf.X_AUTH_TOKEN
 import com.posts.api.follows.FOLLOWED
 import com.posts.api.follows.UNFOLLOWED
 import com.posts.api.web.*
@@ -103,7 +103,7 @@ class ControllersTests {
       val response = doPost<UserDto>(USERS_API, userDtoReq)
       check201(response.statusCode)
       checkStringContains(response.body?.name, userDtoReq.name)
-      checkStringContains(response.headers[X_AUTH_TOKE]?.get(0), ".")
+      checkStringContains(response.headers[X_AUTH_TOKEN]?.get(0), ".")
       checkStringContains(response.headers[LOCATION]?.get(0), "$USERS_API/${response.body?.id}")
       deleteCreatedUser(response.body?.id)
     }
@@ -126,7 +126,7 @@ class ControllersTests {
         doExchange<UserDto>("$USERS_API/${user.id}", HttpMethod.PUT, userDtoReq, true)
       check200(response.statusCode)
       checkStringContains(response.body?.name, userDtoReq.name)
-      checkStringContains(response.headers[X_AUTH_TOKE]?.get(0), ".")
+      checkStringContains(response.headers[X_AUTH_TOKEN]?.get(0), ".")
       deleteCreatedUser(user.id)
     }
 
@@ -473,7 +473,7 @@ class ControllersTests {
 
   private fun getBobAuthHeaders(): HttpHeaders {
     val headers = HttpHeaders()
-    headers[X_AUTH_TOKE] =
+    headers[X_AUTH_TOKEN] =
       "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiQm9iIiwiaWQiOjEsImVtYWlsIjoiYm9iQGJvYi5jb20iLCJzdWIiOiJib2JAYm9iLmNvbSIsImlhdCI6MTYwMjI3OTE5NywiZXhwIjoxOTE3Njc5MTk3fQ.4sV4C_GE8QcedIZHgllu9s6FTq8xsJIwxqFcg5xfVHU"
     return headers
   }
@@ -515,6 +515,6 @@ class ControllersTests {
     val response = doPost<String>(AUTH_API, AuthDtoReq(user.email, Bob.password))
     check200(response.statusCode)
     checkStringContains(response.body, ".")
-    return HttpHeaders().apply { set(X_AUTH_TOKE, response.body) }
+    return HttpHeaders().apply { set(X_AUTH_TOKEN, response.body) }
   }
 }

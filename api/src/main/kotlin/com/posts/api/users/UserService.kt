@@ -1,11 +1,10 @@
 package com.posts.api.users
 
-import com.posts.api.error.ErrorFieldException
+import com.posts.api.error.DataNotFoundException
+import com.posts.api.error.FieldException
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
 @Service
@@ -18,8 +17,7 @@ class UserService(
   fun findOne(id: Long): User = getUserById(id)
 
   fun create(user: User): User {
-    if (userRepo.findOneByEmail(user.email) != null) throw ErrorFieldException(hashMapOf("email" to "the email already exists"),
-      HttpStatus.BAD_REQUEST)
+    if (userRepo.findOneByEmail(user.email) != null) throw FieldException(hashMapOf("email" to "the email already exists"))
     user.password = passwordEncoder.encode(user.password)
     return userRepo.save(user)
   }
@@ -35,11 +33,8 @@ class UserService(
   fun delete(id: Long) = userRepo.deleteById(getUserById(id).id)
 
   fun getUserByEmail(email: String): User = userRepo.findOneByEmail(email)
-    ?: throw ErrorFieldException(
-      hashMapOf("email" to "the email doesn't exists"),
-      HttpStatus.BAD_REQUEST
-    )
+    ?: throw FieldException(hashMapOf("email" to "the email doesn't exists"))
 
   private fun getUserById(id: Long): User = userRepo.findByIdOrNull(id)
-    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User with id not found.")
+    ?: throw DataNotFoundException("User with id not found.")
 }

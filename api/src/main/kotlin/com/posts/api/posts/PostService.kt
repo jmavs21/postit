@@ -1,5 +1,7 @@
 package com.posts.api.posts
 
+import com.posts.api.error.DataNotFoundException
+import com.posts.api.error.ServiceException
 import com.posts.api.follows.FollowId
 import com.posts.api.follows.FollowRepo
 import com.posts.api.users.User
@@ -7,10 +9,8 @@ import com.posts.api.votes.VoteId
 import com.posts.api.votes.VoteRepo
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
 @Service
@@ -41,19 +41,13 @@ class PostService(
       text = updatedPost.text
       updatedat = LocalDateTime.now()
     }
-    if (updatedPost.user.id != post.user.id) throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST,
-      "Needs same user as creator of post to update."
-    )
+    if (updatedPost.user.id != post.user.id) throw ServiceException("Needs same user as creator of post to update.")
     return postRepo.save(post)
   }
 
   fun delete(id: Long, user: User) {
     val post = getPostById(id)
-    if (post.user.id != user.id) throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST,
-      "Needs same user as creator of post to delete."
-    )
+    if (post.user.id != user.id) throw ServiceException("Needs same user as creator of post to delete.")
     postRepo.deleteById(post.id)
   }
 
@@ -94,7 +88,7 @@ class PostService(
   }
 
   private fun getPostById(id: Long): Post = postRepo.findByIdOrNull(id)
-    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found.")
+    ?: throw DataNotFoundException("Post not found.")
 
   private fun getPostForUser(userId: Long, post: Post): Post {
     post.isFollow = followRepo.existsById(FollowId(userId, post.user.id))

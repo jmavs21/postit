@@ -13,10 +13,11 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import javax.validation.ConstraintViolationException
 
-/**
- * Custom exception for field errors that are return to the user.
- */
-class ErrorFieldException(val errors: Map<String, String>, val status: HttpStatus) : Exception()
+class FieldException(val errors: Map<String, String>) : Exception()
+
+class DataNotFoundException(val error: String) : Exception()
+
+class ServiceException(val error: String) : Exception()
 
 /**
  * Global handler of application exceptions with mapping to error messages and codes.
@@ -24,9 +25,17 @@ class ErrorFieldException(val errors: Map<String, String>, val status: HttpStatu
 @ControllerAdvice
 class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
-  @ExceptionHandler(ErrorFieldException::class)
-  fun handleErrorFieldExceptions(ex: ErrorFieldException): ResponseEntity<Any> =
-    ResponseEntity(ex.errors, ex.status)
+  @ExceptionHandler(FieldException::class)
+  fun handleFieldExceptions(ex: FieldException): ResponseEntity<Any> =
+    ResponseEntity(ex.errors, HttpStatus.BAD_REQUEST)
+
+  @ExceptionHandler(DataNotFoundException::class)
+  fun handleDataNotFoundExceptions(ex: DataNotFoundException): ResponseEntity<Any> =
+    ResponseEntity(ex.error, HttpStatus.NOT_FOUND)
+
+  @ExceptionHandler(ServiceException::class)
+  fun handleServiceExceptions(ex: ServiceException): ResponseEntity<Any> =
+    ResponseEntity(ex.error, HttpStatus.BAD_REQUEST)
 
   @ExceptionHandler(ResponseStatusException::class)
   fun handleGlobalExceptions(ex: ResponseStatusException): ResponseEntity<String> =
