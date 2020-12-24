@@ -12,7 +12,6 @@ import java.time.LocalDateTime
 @Service
 class PostService(private val postRepo: PostRepo) {
 
-  @Transactional
   fun findAll(createdate: String, search: String, authUser: Any?, limit: Int): List<Post> {
     val cursorDate = getDateFromCursor(createdate)
     val pageable = PageRequest.of(0, limit)
@@ -20,11 +19,11 @@ class PostService(private val postRepo: PostRepo) {
     return postRepo.findPostsSearch(cursorDate, search, pageable)
   }
 
-  @Transactional
   fun findOne(id: Long, authUser: Any?): Post = getPost(id)
 
   fun create(post: Post): Post = postRepo.save(post)
 
+  @Transactional
   fun update(id: Long, updatedPost: Post): Post {
     val post = getPost(id).apply {
       title = updatedPost.title
@@ -35,6 +34,7 @@ class PostService(private val postRepo: PostRepo) {
     return postRepo.save(post)
   }
 
+  @Transactional
   fun delete(id: Long, user: User) {
     val post = getPost(id)
     if (post.user.id != user.id) throw ServiceException("Needs same user as creator of post to delete.")
