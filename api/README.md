@@ -35,3 +35,11 @@ cd /api
 ### API documentation
 
 - Via [Swagger](http://localhost:4000/swagger-ui.html#/)
+
+### Architecture
+
+- Clean architecture: each layer can only call their inner layers.
+  ![](cleanarchitecture.png)
+
+- Package by component: each domain has its own package component.
+  ![](packagebycomponent.png)

@@ -13,17 +13,11 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import javax.validation.ConstraintViolationException
 
-class FieldException(val errors: Map<String, String>) : Exception()
-
-class DataNotFoundException(val error: String) : Exception()
-
-class ServiceException(val error: String) : Exception()
-
 /**
  * Global handler of application exceptions with mapping to error messages and codes.
  */
 @ControllerAdvice
-class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
+class ErrorHandler : ResponseEntityExceptionHandler() {
 
   @ExceptionHandler(FieldException::class)
   fun handleFieldExceptions(ex: FieldException): ResponseEntity<Any> =
