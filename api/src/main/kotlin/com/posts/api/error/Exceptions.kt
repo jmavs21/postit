@@ -1,7 +1,9 @@
 package com.posts.api.error
 
-class FieldException(val errors: Map<String, String>) : Exception()
+import kotlin.RuntimeException
 
-class DataNotFoundException(val error: String) : Exception()
+class FieldException(val errors: Map<String, String>) : RuntimeException()
 
-class ServiceException(val error: String) : Exception()
+class DataNotFoundException(val error: String) : RuntimeException()
+
+class ServiceException(val error: String) : RuntimeException()
