@@ -38,7 +38,7 @@ cd /api
 
 ### Architecture
 
-- Clean architecture: each layer can only call their inner layers.
+- Multilayered architecture: each layer can only call their inner layers.
   ![](cleanarchitecture.png)
 
 - Package by component: each domain has its own package component.
