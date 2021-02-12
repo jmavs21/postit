@@ -1,8 +1,12 @@
 package com.posts.api.conf
 
+import com.posts.api.cache.UserCache
+import com.posts.api.cache.UserCacheRepo
+import com.posts.api.users.User
 import com.posts.api.users.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -91,10 +95,21 @@ class MyAuthenticationEntryPoint : AuthenticationEntryPoint {
 }
 
 /**
- * AuthenticationManager will use this method to fetch the user.
+ * AuthenticationManager will use this method to fetch the user from cache otherwise from store.
  */
 @Service
-class MyUserDetailsService(val userService: UserService) : UserDetailsService {
+class MyUserDetailsService(val userService: UserService, val userCacheRepo: UserCacheRepo) :
+  UserDetailsService {
 
-  override fun loadUserByUsername(email: String): UserDetails = userService.getUserByEmail(email)
+  override fun loadUserByUsername(email: String): UserDetails {
+    val userCache = userCacheRepo.findByIdOrNull(email)
+    if (userCache != null) return User().apply {
+      this.email = userCache.email
+      this.name = userCache.name
+      this.id = userCache.id
+    }
+    val user = userService.getUserByEmail(email)
+    userCacheRepo.save(UserCache(user.email, user.name, user.id))
+    return user
+  }
 }

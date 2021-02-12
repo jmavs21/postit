@@ -25,6 +25,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-security")
+  implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
   implementation("io.jsonwebtoken:jjwt-api:0.11.1")
   runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.1")
@@ -36,6 +37,8 @@ dependencies {
 
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   runtimeOnly("com.h2database:h2")
+
+  implementation("it.ozimov:embedded-redis:0.7.2")
 
   testCompileOnly("org.springframework.security:spring-security-test")
   testRuntimeOnly("org.apache.httpcomponents:httpclient")
