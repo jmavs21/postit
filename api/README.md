@@ -9,6 +9,7 @@
   - Spring Security
   - Spring Validation
 - H2 Database
+- Embedded Redis
 - Java JWT
 - Swagger
 

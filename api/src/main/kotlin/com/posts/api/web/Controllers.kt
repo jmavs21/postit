@@ -39,7 +39,7 @@ class AuthController(
 
   @PostMapping
   fun create(@Valid @RequestBody authDtoReq: AuthDtoReq): String {
-    val user = userService.getUserByEmail(authDtoReq.email)
+    val user = userService.getUserWithPassByEmail(authDtoReq.email)
     if (!passwordEncoder.matches(authDtoReq.password,
         user.password)
     ) throw FieldException(hashMapOf("password" to "incorrect email or password"))

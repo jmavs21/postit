@@ -1,4 +1,4 @@
-package com.posts.api.cache
+package com.posts.api.users.cache
 
 import org.springframework.data.repository.CrudRepository
 
