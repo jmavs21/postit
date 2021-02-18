@@ -46,4 +46,8 @@ class User : UserDetails {
   fun setPassword(password: String) {
     this.password = password
   }
+
+  override fun toString(): String {
+    return "User(name=$name, email=$email, id=$id)"
+  }
 }

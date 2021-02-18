@@ -29,11 +29,16 @@ class UserService(private val userRepo: UserRepo, private val userCacheRepo: Use
       name = updatedUser.name
       updatedate = LocalDateTime.now()
     }
+    userCacheRepo.save(UserCache(user.email, user.name, user.id))
     return userRepo.save(user)
   }
 
   @Transactional
-  fun delete(id: Long) = userRepo.deleteById(getUserById(id).id)
+  fun delete(id: Long) {
+    val user = getUserById(id)
+    userRepo.deleteById(user.id)
+    userCacheRepo.deleteById(user.email)
+  }
 
   fun getUserByEmail(email: String): User {
     val userCache = userCacheRepo.findByIdOrNull(email)
