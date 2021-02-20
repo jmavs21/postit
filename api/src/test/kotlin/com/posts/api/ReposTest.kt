@@ -21,7 +21,7 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
 
 @DataJpaTest
-class RepositoriesTests @Autowired constructor(
+class ReposTest @Autowired constructor(
   val userRepo: UserRepo,
   val postRepo: PostRepo,
   val voteRepo: VoteRepo,

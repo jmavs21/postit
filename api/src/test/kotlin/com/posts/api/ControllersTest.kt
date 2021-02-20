@@ -19,7 +19,7 @@ const val TOTAL_POSTS = 100
 const val LOCATION = "location"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ControllersTests {
+class ControllersTest {
 
   @Autowired
   lateinit var testRestTemplate: TestRestTemplate

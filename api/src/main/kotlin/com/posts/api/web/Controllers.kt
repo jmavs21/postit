@@ -7,6 +7,7 @@ import com.posts.api.follows.FollowId
 import com.posts.api.follows.FollowService
 import com.posts.api.posts.Post
 import com.posts.api.posts.PostService
+import com.posts.api.sse.SseFeedService
 import com.posts.api.users.User
 import com.posts.api.users.UserService
 import com.posts.api.votes.VoteId
@@ -19,8 +20,10 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.net.URI
 import javax.validation.Valid
+
 
 const val AUTH_API = "/api/auth"
 const val USERS_API = "/api/users"
@@ -101,7 +104,17 @@ class PostController(
   private val postService: PostService,
   private val followService: FollowService,
   private val voteService: VoteService,
+  private val sseFeedService: SseFeedService,
 ) {
+
+  @GetMapping("/see-feed/{id}")
+  fun sseFeed(@PathVariable id: Long): SseEmitter {
+    val emitter = SseEmitter()
+    emitter.onCompletion { sseFeedService.removeEmitter(id) }
+    emitter.onTimeout { sseFeedService.removeEmitter(id) }
+    sseFeedService.addEmitter(id, emitter)
+    return emitter
+  }
 
   @GetMapping("/")
   fun findAll(
@@ -129,6 +142,7 @@ class PostController(
     auth: Authentication,
   ): ResponseEntity<PostDto> {
     val post = postService.create(newPost.toEntity(auth.principal as User))
+    sseFeedService.feedNotify(post.user.name, post.user.id)
     return ResponseEntity.created(URI("$POSTS_API/${post.id}")).body(post.toDto())
   }
 

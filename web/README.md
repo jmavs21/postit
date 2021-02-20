@@ -10,6 +10,7 @@
 - Axios
 - JWT decode
 - React Waypoint
+- Server-Sent Events API
 
 ### Installation
 

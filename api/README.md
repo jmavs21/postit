@@ -11,6 +11,7 @@
 - H2 Database
 - Embedded Redis
 - Java JWT
+- Server-Sent Events
 - Swagger
 
 ### Installation

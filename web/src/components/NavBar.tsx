@@ -1,14 +1,39 @@
-import { Flex, Heading, IconButton, Text, useColorMode } from '@chakra-ui/core';
+import {
+  Flex,
+  Heading,
+  IconButton,
+  Text,
+  useColorMode,
+  useToast,
+} from '@chakra-ui/core';
 import { Form, Formik } from 'formik';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { SEARCH_QUERY } from '../utils/constants';
+import { SEARCH_QUERY, SSE_FEED } from '../utils/constants';
 import { UserContext } from '../utils/UserContext';
 import { SearchField } from './SearchField';
 
 export const NavBar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { user, setUser } = useContext(UserContext);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (!user) return;
+    const eventSource = new EventSource(SSE_FEED + '/' + user.id);
+    eventSource.onmessage = (event) => {
+      toast({
+        title: event.data,
+        status: 'info',
+        duration: null,
+        isClosable: true,
+        position: 'bottom-left',
+      });
+    };
+    eventSource.onerror = (event) => eventSource.close();
+    return () => eventSource.close();
+  }, [user, toast]);
+
   return (
     <Flex
       bg="LightCoral"
