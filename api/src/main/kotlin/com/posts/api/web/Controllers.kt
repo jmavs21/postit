@@ -7,11 +7,11 @@ import com.posts.api.follows.FollowId
 import com.posts.api.follows.FollowService
 import com.posts.api.posts.Post
 import com.posts.api.posts.PostService
-import com.posts.api.sse.SseFeedService
 import com.posts.api.users.User
 import com.posts.api.users.UserService
 import com.posts.api.votes.VoteId
 import com.posts.api.votes.VoteService
+import com.posts.api.web.sse.SseFeedService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NO_CONTENT

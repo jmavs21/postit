@@ -1,4 +1,4 @@
-package com.posts.api.sse
+package com.posts.api.web.sse
 
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service

@@ -13,23 +13,6 @@ import javax.annotation.PreDestroy
 
 private var redisServer: RedisServer? = null
 
-@Component
-class EmbeddedRedis(@Value("\${spring.redis.port}") val port: Int) {
-
-  @PostConstruct
-  fun postConstruct() {
-    if (redisServer == null || !redisServer!!.isActive) {
-      redisServer = RedisServer(port)
-      redisServer!!.start()
-    }
-  }
-
-  @PreDestroy
-  fun preDestroy() {
-    if (redisServer != null) redisServer!!.stop()
-  }
-}
-
 @Configuration
 @EnableRedisRepositories
 class RedisConfig(
@@ -45,5 +28,22 @@ class RedisConfig(
     val template = RedisTemplate<ByteArray, ByteArray>()
     template.setConnectionFactory(redisConnectionFactory)
     return template
+  }
+}
+
+@Component
+class EmbeddedRedis(@Value("\${spring.redis.port}") val port: Int) {
+
+  @PostConstruct
+  fun postConstruct() {
+    if (redisServer == null || !redisServer!!.isActive) {
+      redisServer = RedisServer(port)
+      redisServer!!.start()
+    }
+  }
+
+  @PreDestroy
+  fun preDestroy() {
+    if (redisServer != null) redisServer!!.stop()
   }
 }

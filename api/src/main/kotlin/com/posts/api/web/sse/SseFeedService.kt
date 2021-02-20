@@ -1,4 +1,4 @@
-package com.posts.api.sse
+package com.posts.api.web.sse
 
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 

@@ -5,7 +5,7 @@ import org.springframework.data.redis.core.RedisHash
 
 @RedisHash("UserCache")
 data class UserCache(
-  @Id var email: String,
-  var name: String,
-  var id: Long,
+  @Id val email: String,
+  val name: String,
+  val id: Long,
 )
