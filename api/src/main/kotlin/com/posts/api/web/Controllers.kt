@@ -1,7 +1,7 @@
 package com.posts.api.web
 
 import com.posts.api.conf.JwtTokenUtil
-import com.posts.api.conf.MessagePublisher
+import com.posts.api.conf.PublisherSse
 import com.posts.api.conf.X_AUTH_TOKEN
 import com.posts.api.error.FieldException
 import com.posts.api.follows.FollowId
@@ -12,7 +12,7 @@ import com.posts.api.users.User
 import com.posts.api.users.UserService
 import com.posts.api.votes.VoteId
 import com.posts.api.votes.VoteService
-import com.posts.api.web.sse.SseFeedService
+import com.posts.api.web.sse.FeedSse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.net.URI
 import javax.validation.Valid
-
 
 const val AUTH_API = "/api/auth"
 const val USERS_API = "/api/users"
@@ -105,16 +104,16 @@ class PostController(
   private val postService: PostService,
   private val followService: FollowService,
   private val voteService: VoteService,
-  private val sseFeedService: SseFeedService,
-  private val messagePublisher: MessagePublisher,
+  private val feedSse: FeedSse,
+  private val publisherSse: PublisherSse,
 ) {
 
-  @GetMapping("/see-feeds/{id}")
-  fun sseFeed(@PathVariable id: Long): SseEmitter {
+  @GetMapping("/see-feeds/{userId}")
+  fun sseFeed(@PathVariable userId: Long): SseEmitter {
     val emitter = SseEmitter()
-    emitter.onCompletion { sseFeedService.removeEmitter(id) }
-    emitter.onTimeout { sseFeedService.removeEmitter(id) }
-    sseFeedService.addEmitter(id, emitter)
+    emitter.onCompletion { feedSse.removeEmitter(userId) }
+    emitter.onTimeout { feedSse.removeEmitter(userId) }
+    feedSse.addEmitter(userId, emitter)
     return emitter
   }
 
@@ -144,7 +143,7 @@ class PostController(
     auth: Authentication,
   ): ResponseEntity<PostDto> {
     val post = postService.create(newPost.toEntity(auth.principal as User))
-    messagePublisher.publish("${post.user.name}|${post.user.id}")
+    publisherSse.publish(post.user.name, post.user.id)
     return ResponseEntity.created(URI("$POSTS_API/${post.id}")).body(post.toDto())
   }
 

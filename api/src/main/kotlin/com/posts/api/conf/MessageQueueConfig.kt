@@ -1,6 +1,6 @@
 package com.posts.api.conf
 
-import com.posts.api.web.sse.SseFeedService
+import com.posts.api.web.sse.FeedSse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.connection.Message
@@ -9,60 +9,50 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.listener.ChannelTopic
 import org.springframework.data.redis.listener.RedisMessageListenerContainer
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter
 import org.springframework.stereotype.Service
+
+const val SEPARATOR = "|"
 
 @Configuration
 class MessageQueueConfig {
 
   @Bean
-  fun sseTopic(): ChannelTopic {
+  fun topicSse(): ChannelTopic {
     return ChannelTopic("sse:queue")
   }
 
   @Bean
-  fun messagePublisher(
-    redisTemplate: RedisTemplate<String, Any>,
-    sseTopic: ChannelTopic,
-  ): MessagePublisher = RedisMessagePublisher(redisTemplate, sseTopic)
-
-  @Bean
-  fun messageListenerAdapter(sseFeedService: SseFeedService): MessageListenerAdapter =
-    MessageListenerAdapter(RedisMessageSubscriber(sseFeedService))
-
-  @Bean
   fun redisContainer(
     redisConnectionFactory: LettuceConnectionFactory,
-    messageListenerAdapter: MessageListenerAdapter,
-    sseTopic: ChannelTopic,
+    messageListener: MessageListener,
+    topicSse: ChannelTopic,
   ): RedisMessageListenerContainer = RedisMessageListenerContainer().apply {
     setConnectionFactory(redisConnectionFactory)
-    addMessageListener(messageListenerAdapter, sseTopic)
+    addMessageListener(messageListener, topicSse)
   }
 }
 
-interface MessagePublisher {
-  fun publish(message: String)
+interface PublisherSse {
+  fun publish(userName: String, userId: Long)
 }
 
 @Service
-class RedisMessagePublisher(
+internal class PublisherSseImpl(
   private var redisTemplate: RedisTemplate<String, Any>,
   private var topic: ChannelTopic,
-) : MessagePublisher {
+) : PublisherSse {
 
-  override fun publish(message: String) {
-    redisTemplate.convertAndSend(topic.topic, message)
+  override fun publish(userName: String, userId: Long) {
+    redisTemplate.convertAndSend(topic.topic, "${userName}$SEPARATOR${userId}")
   }
 }
 
 @Service
-class RedisMessageSubscriber(private val sseFeedService: SseFeedService) : MessageListener {
+internal class SubscriberSseImpl(private val feedSse: FeedSse) :
+  MessageListener {
 
   override fun onMessage(message: Message, pattern: ByteArray?) {
-    val body = String(message.body)
-    println("***** Message received body: $body")
-    val parts = body.split("|")
-    sseFeedService.feedNotify(parts[0], parts[1].toLong())
+    val (name, id) = String(message.body).split(SEPARATOR)
+    feedSse.sendToEmitters(name, id.toLong())
   }
 }

@@ -6,26 +6,26 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
-internal class SseFeedServiceImpl(private val emitters: MutableMap<Long, SseEmitter> = ConcurrentHashMap()) :
-  SseFeedService {
+internal class FeedSseImpl(private val emitters: MutableMap<Long, SseEmitter> = ConcurrentHashMap()) :
+  FeedSse {
 
-  override fun addEmitter(id: Long, emitter: SseEmitter) {
-    emitters[id] = emitter
+  override fun addEmitter(userId: Long, emitter: SseEmitter) {
+    emitters[userId] = emitter
   }
 
-  override fun removeEmitter(id: Long) {
-    emitters.remove(id)
+  override fun removeEmitter(userId: Long) {
+    emitters.remove(userId)
   }
 
   @Async
-  override fun feedNotify(userName: String, exceptFromId: Long) {
+  override fun sendToEmitters(userName: String, skipUserId: Long) {
     val deadEmitters = mutableListOf<Long>()
-    for ((id, emitter) in emitters) {
+    for ((userId, emitter) in emitters) {
       try {
-        if (id == exceptFromId) continue
+        if (userId == skipUserId) continue
         emitter.send("New post from $userName")
       } catch (e: Exception) {
-        deadEmitters.add(id)
+        deadEmitters.add(userId)
       }
     }
     for (id in deadEmitters) {

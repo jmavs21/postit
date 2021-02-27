@@ -25,7 +25,7 @@ export const NavBar: React.FC = () => {
       toast({
         title: event.data,
         status: 'info',
-        duration: null,
+        duration: 10_000,
         isClosable: true,
         position: 'bottom-left',
       });
