@@ -4,6 +4,7 @@ import com.posts.api.follows.Follow
 import com.posts.api.posts.Post
 import com.posts.api.users.User
 import java.time.LocalDateTime
+import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 const val TEXT_SNIPPET_SIZE = 200
@@ -18,6 +19,7 @@ data class AuthDtoReq(
 
 data class UserCreateDtoReq(
   @field:Size(min = 1, max = 50)
+  @field:Pattern(regexp = "^[A-Za-z0-9]*\$")
   val name: String,
 
   @field:Size(min = 1, max = 50)
@@ -38,6 +40,7 @@ data class UserCreateDtoReq(
 
 data class UserUpdateDtoReq(
   @field:Size(min = 1, max = 50)
+  @field:Pattern(regexp = "^[A-Za-z0-9]*\$")
   val name: String,
 ) {
 

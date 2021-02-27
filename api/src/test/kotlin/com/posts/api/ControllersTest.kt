@@ -119,6 +119,14 @@ class ControllersTest {
     }
 
     @Test
+    fun `when USERS_API POST with invalid non-alphanumeric name for new user then 400`() {
+      val response = doPost<String>(USERS_API, UserCreateDtoReq("|", "zack@mail.com", "zack"))
+      check400(response.statusCode)
+      checkJsons(response.body,
+        mapOf("$.name" to "must match \"^[A-Za-z0-9]*$\""))
+    }
+
+    @Test
     fun `when USERS_API-{id} PUT with valid update user and headers then user token and 200`() {
       val user = createUser()
       val userDtoReq = UserUpdateDtoReq("UpdatedName")
@@ -131,11 +139,19 @@ class ControllersTest {
     }
 
     @Test
-    fun `when USERS_API-{id} PUT with invalid name but valid headers for update user then 400`() {
+    fun `when USERS_API-{id} PUT with invalid name size but valid headers for update user then 400`() {
       val response =
         doExchange<String>("$USERS_API/${Bob.id}", HttpMethod.PUT, UserUpdateDtoReq(""), true)
       check400(response.statusCode)
       checkJsons(response.body, mapOf("$.name" to "size must be between 1 and 50"))
+    }
+
+    @Test
+    fun `when USERS_API-{id} PUT with invalid name non-alphanumeric but valid headers for update user then 400`() {
+      val response =
+        doExchange<String>("$USERS_API/${Bob.id}", HttpMethod.PUT, UserUpdateDtoReq("|"), true)
+      check400(response.statusCode)
+      checkJsons(response.body, mapOf("$.name" to "must match \"^[A-Za-z0-9]*$\""))
     }
 
     @Test

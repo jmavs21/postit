@@ -1,6 +1,7 @@
 package com.posts.api.web
 
 import com.posts.api.conf.JwtTokenUtil
+import com.posts.api.conf.MessagePublisher
 import com.posts.api.conf.X_AUTH_TOKEN
 import com.posts.api.error.FieldException
 import com.posts.api.follows.FollowId
@@ -105,9 +106,10 @@ class PostController(
   private val followService: FollowService,
   private val voteService: VoteService,
   private val sseFeedService: SseFeedService,
+  private val messagePublisher: MessagePublisher,
 ) {
 
-  @GetMapping("/see-feed/{id}")
+  @GetMapping("/see-feeds/{id}")
   fun sseFeed(@PathVariable id: Long): SseEmitter {
     val emitter = SseEmitter()
     emitter.onCompletion { sseFeedService.removeEmitter(id) }
@@ -142,7 +144,7 @@ class PostController(
     auth: Authentication,
   ): ResponseEntity<PostDto> {
     val post = postService.create(newPost.toEntity(auth.principal as User))
-    sseFeedService.feedNotify(post.user.name, post.user.id)
+    messagePublisher.publish("${post.user.name}|${post.user.id}")
     return ResponseEntity.created(URI("$POSTS_API/${post.id}")).body(post.toDto())
   }
 

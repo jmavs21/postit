@@ -28,7 +28,7 @@ const val X_AUTH_TOKEN = "x-auth-token"
  */
 @Component
 class JwtRequestFilter(
-  val myUserDetailsService: MyUserDetailsService,
+  val userDetailsServiceImpl: UserDetailsServiceImpl,
   val jwtTokenUtil: JwtTokenUtil,
 ) : OncePerRequestFilter() {
 
@@ -58,7 +58,7 @@ class JwtRequestFilter(
 
   private fun authenticateUser(request: HttpServletRequest, jwtToken: String, username: String) {
     if (SecurityContextHolder.getContext().authentication == null) {
-      val userDetails = myUserDetailsService.loadUserByUsername(username)
+      val userDetails = userDetailsServiceImpl.loadUserByUsername(username)
       if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
         val usernamePasswordAuthenticationToken =
           UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities).apply {

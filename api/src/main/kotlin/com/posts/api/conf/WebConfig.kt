@@ -33,8 +33,8 @@ import javax.servlet.http.HttpServletResponse
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig(
-  val myAuthenticationEntryPoint: MyAuthenticationEntryPoint,
-  val myUserDetailsService: MyUserDetailsService,
+  val authenticationEntryPoint: AuthenticationEntryPointImpl,
+  val userDetailsService: UserDetailsServiceImpl,
   val jwtRequestFilter: JwtRequestFilter,
 ) : WebSecurityConfigurerAdapter() {
 
@@ -42,8 +42,8 @@ class WebSecurityConfig(
   fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
   @Autowired
-  fun configureGlobal(auth: AuthenticationManagerBuilder) {
-    auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder())
+  fun configureGlobal(auth: AuthenticationManagerBuilder, passwordEncoder: PasswordEncoder) {
+    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder)
   }
 
   override fun configure(httpSecurity: HttpSecurity) {
@@ -53,7 +53,7 @@ class WebSecurityConfig(
       .antMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
       .antMatchers("/api/auth", "/api/users").permitAll()
       .anyRequest().authenticated().and().exceptionHandling()
-      .authenticationEntryPoint(myAuthenticationEntryPoint).and()
+      .authenticationEntryPoint(authenticationEntryPoint).and()
       .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
   }
@@ -82,7 +82,7 @@ class WebSecurityConfig(
  * Rejects every unauthenticated request and sends an 401 error code.
  */
 @Component
-class MyAuthenticationEntryPoint : AuthenticationEntryPoint {
+class AuthenticationEntryPointImpl : AuthenticationEntryPoint {
 
   override fun commence(
     request: HttpServletRequest?, response: HttpServletResponse,
@@ -94,7 +94,7 @@ class MyAuthenticationEntryPoint : AuthenticationEntryPoint {
  * AuthenticationManager will use this method to fetch the user from cache otherwise from store.
  */
 @Service
-class MyUserDetailsService(val userService: UserService) :
+class UserDetailsServiceImpl(val userService: UserService) :
   UserDetailsService {
 
   override fun loadUserByUsername(email: String): UserDetails = userService.getUserByEmail(email)
