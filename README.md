@@ -17,7 +17,7 @@ A web application for posting messages.
 - Voting on posts
 - Follow users
 - Pagination
-- Feed notification with Server-Sent Events
+- Feed notification via Server-Sent Events
 - Light and dark modes
 
 ## Technologies used

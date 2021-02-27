@@ -5,7 +5,7 @@
 - TypeScript
 - React
 - Chakra UI
-- React router dom
+- React Router DOM
 - Formik
 - Axios
 - JWT decode

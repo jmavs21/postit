@@ -1,11 +1,13 @@
 package com.posts.api.web.sse
 
 import org.springframework.scheduling.annotation.Async
+import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
+@EnableAsync
 internal class FeedSseImpl(private val emitters: MutableMap<Long, SseEmitter> = ConcurrentHashMap()) :
   FeedSse {
 
