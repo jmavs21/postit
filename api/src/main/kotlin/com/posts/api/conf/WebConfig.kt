@@ -33,8 +33,8 @@ import javax.servlet.http.HttpServletResponse
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig(
-  val authenticationEntryPoint: AuthenticationEntryPointImpl,
-  val userDetailsService: UserDetailsServiceImpl,
+  val authenticationEntryPoint: AuthenticationEntryPoint,
+  val userDetailsService: UserDetailsService,
   val jwtRequestFilter: JwtRequestFilter,
 ) : WebSecurityConfigurerAdapter() {
 
@@ -42,8 +42,8 @@ class WebSecurityConfig(
   fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
   @Autowired
-  fun configureGlobal(auth: AuthenticationManagerBuilder, passwordEncoder: PasswordEncoder) {
-    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder)
+  fun configureGlobal(auth: AuthenticationManagerBuilder) {
+    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder())
   }
 
   override fun configure(httpSecurity: HttpSecurity) {

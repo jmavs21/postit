@@ -13,6 +13,7 @@ import com.posts.api.users.UserService
 import com.posts.api.votes.VoteId
 import com.posts.api.votes.VoteService
 import com.posts.api.web.sse.FeedSse
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -45,7 +46,7 @@ class AuthController(
     val user = userService.getUserWithPassByEmail(authDtoReq.email)
     if (!passwordEncoder.matches(authDtoReq.password,
         user.password)
-    ) throw FieldException(hashMapOf("password" to "incorrect email or password"))
+    ) throw FieldException(mutableMapOf("password" to "incorrect email or password"))
     return jwtTokenUtil.generateToken(user)
   }
 }
@@ -106,11 +107,12 @@ class PostController(
   private val voteService: VoteService,
   private val feedSse: FeedSse,
   private val publisherSse: PublisherSse,
+  @Value("\${sse.connection.timeout.ms}") val timeoutSse: Long
 ) {
 
   @GetMapping("/see-feeds/{userId}")
   fun sseFeed(@PathVariable userId: Long): SseEmitter {
-    val emitter = SseEmitter()
+    val emitter = SseEmitter(timeoutSse)
     emitter.onCompletion { feedSse.removeEmitter(userId) }
     emitter.onTimeout { feedSse.removeEmitter(userId) }
     feedSse.addEmitter(userId, emitter)
@@ -183,7 +185,7 @@ class PostController(
     followService.findAllByFromId(userId).map { it.to.id }.toSet()
 
   private fun getMapOfUserPostsVotes(userId: Long): Map<Long, Int> {
-    val postIdToValue = hashMapOf<Long, Int>()
+    val postIdToValue = mutableMapOf<Long, Int>()
     for (userVote in voteService.findAllByUserId(userId)) {
       postIdToValue[userVote.post.id] = userVote.value
     }
@@ -193,7 +195,10 @@ class PostController(
 
 @RestController
 @RequestMapping(VOTES_API)
-class VoteController(private val voteService: VoteService, private val postService: PostService) {
+class VoteController(
+  private val voteService: VoteService,
+  private val postService: PostService,
+) {
 
   @PostMapping
   @ResponseStatus(CREATED)

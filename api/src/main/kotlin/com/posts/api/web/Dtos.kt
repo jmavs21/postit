@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
-const val TEXT_SNIPPET_SIZE = 200
+private const val TEXT_SNIPPET_SIZE = 200
 
 data class AuthDtoReq(
   @field:Size(min = 1, max = 50)

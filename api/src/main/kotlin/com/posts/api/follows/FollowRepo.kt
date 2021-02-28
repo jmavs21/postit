@@ -3,7 +3,7 @@ package com.posts.api.follows
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
-interface FollowRepo : CrudRepository<Follow, FollowId> {
+internal interface FollowRepo : CrudRepository<Follow, FollowId> {
 
   @Query(value = """
     SELECT f, u

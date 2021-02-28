@@ -11,7 +11,7 @@ import org.springframework.data.redis.listener.ChannelTopic
 import org.springframework.data.redis.listener.RedisMessageListenerContainer
 import org.springframework.stereotype.Service
 
-const val SEPARATOR = "|"
+private const val SEPARATOR = "|"
 
 @Configuration
 class MessageQueueConfig {

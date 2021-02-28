@@ -59,7 +59,7 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
     status: HttpStatus,
     request: WebRequest,
   ): ResponseEntity<Any> {
-    val errors: MutableMap<String, String?> = HashMap()
+    val errors: MutableMap<String, String?> = mutableMapOf()
     for (error in ex.bindingResult.fieldErrors) {
       errors[error.field] = error.defaultMessage
     }

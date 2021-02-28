@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -28,7 +29,7 @@ const val X_AUTH_TOKEN = "x-auth-token"
  */
 @Component
 class JwtRequestFilter(
-  val userDetailsServiceImpl: UserDetailsServiceImpl,
+  val userDetailsService: UserDetailsService,
   val jwtTokenUtil: JwtTokenUtil,
 ) : OncePerRequestFilter() {
 
@@ -58,16 +59,17 @@ class JwtRequestFilter(
 
   private fun authenticateUser(request: HttpServletRequest, jwtToken: String, username: String) {
     if (SecurityContextHolder.getContext().authentication == null) {
-      val userDetails = userDetailsServiceImpl.loadUserByUsername(username)
+      val userDetails = userDetailsService.loadUserByUsername(username)
       if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-        val usernamePasswordAuthenticationToken =
-          UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities).apply {
-            details = WebAuthenticationDetailsSource().buildDetails(request)
-          }
-        SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
+        SecurityContextHolder.getContext().authentication = getAuthInfo(userDetails, request)
       }
     }
   }
+
+  private fun getAuthInfo(userDetails: UserDetails, request: HttpServletRequest) =
+    UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities).apply {
+      details = WebAuthenticationDetailsSource().buildDetails(request)
+    }
 }
 
 /**
@@ -78,8 +80,8 @@ class JwtTokenUtil(
   @Value("\${jwt.secret}")
   val jwtSecret: String,
 
-  @Value("\${jwt.expiration.millis}")
-  val jwtExpirationMillis: String,
+  @Value("\${jwt.expiration.ms}")
+  val jwtExpirationMs: Long,
 ) {
 
   fun getUsernameFromToken(token: String): String = getAllClaimsFromToken(token).subject
@@ -87,7 +89,7 @@ class JwtTokenUtil(
   fun generateToken(user: User): String =
     Jwts.builder().setClaims(getClaims(user)).setSubject(user.email)
       .setIssuedAt(Date(System.currentTimeMillis()))
-      .setExpiration(Date(System.currentTimeMillis() + jwtExpirationMillis.toLong()))
+      .setExpiration(Date(System.currentTimeMillis() + jwtExpirationMs))
       .signWith(getSigningKey()).compact()
 
   fun validateToken(token: String, userDetails: UserDetails): Boolean =
@@ -97,7 +99,7 @@ class JwtTokenUtil(
     Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).body
 
   private fun getClaims(user: User): Map<String, Any> =
-    hashMapOf("id" to user.id, "name" to user.name, "email" to user.email)
+    mutableMapOf("id" to user.id, "name" to user.name, "email" to user.email)
 
   private fun isTokenExpired(token: String): Boolean =
     getAllClaimsFromToken(token).expiration.before(Date())

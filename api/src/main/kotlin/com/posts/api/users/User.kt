@@ -29,7 +29,7 @@ class User : UserDetails {
   @Column(nullable = false)
   var updatedate: LocalDateTime = LocalDateTime.now()
 
-  override fun getAuthorities(): Collection<GrantedAuthority?> = ArrayList()
+  override fun getAuthorities(): Collection<GrantedAuthority?> = mutableListOf()
 
   override fun isEnabled(): Boolean = true
 
@@ -47,7 +47,5 @@ class User : UserDetails {
     this.password = password
   }
 
-  override fun toString(): String {
-    return "User(name=$name, email=$email, id=$id)"
-  }
+  override fun toString(): String = "User(name=$name, email=$email, id=$id)"
 }

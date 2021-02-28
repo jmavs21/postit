@@ -12,8 +12,6 @@ import redis.embedded.RedisServer
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
-private var redisServer: RedisServer? = null
-
 @Configuration
 @EnableRedisRepositories
 class RedisConfig(
@@ -32,6 +30,8 @@ class RedisConfig(
     }
   }
 }
+
+private var redisServer: RedisServer? = null
 
 @Component
 class EmbeddedRedis(@Value("\${spring.redis.port}") val port: Int) {

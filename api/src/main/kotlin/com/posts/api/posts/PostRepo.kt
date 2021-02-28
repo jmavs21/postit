@@ -6,7 +6,7 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.data.repository.query.Param
 import java.time.LocalDateTime
 
-interface PostRepo : PagingAndSortingRepository<Post, Long> {
+internal interface PostRepo : PagingAndSortingRepository<Post, Long> {
 
   @Query(value = """
     SELECT p, u 

@@ -1,4 +1,4 @@
-package com.posts.api
+package com.posts.api.util
 
 import com.jayway.jsonpath.JsonPath
 import org.assertj.core.api.Assertions.assertThat
