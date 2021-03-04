@@ -19,7 +19,7 @@ data class AuthDtoReq(
 
 data class UserCreateDtoReq(
   @field:Size(min = 1, max = 50)
-  @field:Pattern(regexp = "^[A-Za-z0-9]*\$")
+  @field:Pattern(regexp = "^[A-Za-z0-9]*\$", message = "only alphanumeric")
   val name: String,
 
   @field:Size(min = 1, max = 50)
@@ -40,7 +40,7 @@ data class UserCreateDtoReq(
 
 data class UserUpdateDtoReq(
   @field:Size(min = 1, max = 50)
-  @field:Pattern(regexp = "^[A-Za-z0-9]*\$")
+  @field:Pattern(regexp = "^[A-Za-z0-9]*\$", message = "only alphanumeric")
   val name: String,
 ) {
 

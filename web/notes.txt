@@ -11,6 +11,9 @@ npm i immer --save
 npm i react-waypoint --save
 npm i lodash --save
 npm i @types/lodash --save
+npm i cypress --save-dev
+npm i eslint-plugin-cypress --save-dev
+npm i chance --save-dev
 
 -- INDEX SETUP --
 index.tsx
@@ -104,3 +107,14 @@ const updatePostVote = (
 updatePostVote(post.id, response.data, isUpVote ? 1 : -1);
 
 // eslint-disable-line react-hooks/exhaustive-deps
+
+-- TESTS --
+open: node_modules/.bin/cypress open
+      npm run cypress:open
+
+added file .eslintrc.json on cypress
+  {
+    "extends": [
+      "plugin:cypress/recommended"
+    ]
+  }

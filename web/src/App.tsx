@@ -36,7 +36,7 @@ const App: React.FC = () => {
             <Route path="/logout" component={Logout} />
             <ProtectedRoute path="/profile" component={Profile} />
             <ProtectedRoute path="/posts/new" component={CreatePost} />
-            <Route path="/posts/udpate/:id" component={PostUpdate} />
+            <Route path="/posts/update/:id" component={PostUpdate} />
             <Route path="/posts/:id" component={PostView} />
             <Route path="/posts" component={Posts} />
             <Route path="/not-found" component={NotFound} />

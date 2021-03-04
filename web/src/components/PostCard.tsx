@@ -50,7 +50,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         </Box>
         {user?.id === p.user.id ? (
           <Flex justifyContent="flex-end">
-            <NavLink to={'/posts/udpate/' + p.id}>
+            <NavLink to={'/posts/update/' + p.id}>
               <IconButton
                 icon="edit"
                 size="xs"

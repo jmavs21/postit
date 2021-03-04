@@ -124,7 +124,7 @@ class ControllersTest {
       val response = doPost<String>(USERS_API, UserCreateDtoReq("|", "zack@mail.com", "zack"))
       check400(response.statusCode)
       checkJsons(response.body,
-        mapOf("$.name" to "must match \"^[A-Za-z0-9]*$\""))
+        mapOf("$.name" to "only alphanumeric"))
     }
 
     @Test
@@ -152,7 +152,7 @@ class ControllersTest {
       val response =
         doExchange<String>("$USERS_API/${Bob.id}", HttpMethod.PUT, UserUpdateDtoReq("|"), true)
       check400(response.statusCode)
-      checkJsons(response.body, mapOf("$.name" to "must match \"^[A-Za-z0-9]*$\""))
+      checkJsons(response.body, mapOf("$.name" to "only alphanumeric"))
     }
 
     @Test
