@@ -6,4 +6,11 @@ describe('protected routes', () => {
     cy.contains('Email');
     cy.contains('Password');
   });
+
+  it('forwards to login if try to enter profile', () => {
+    cy.visit('/profile');
+    cy.url().should('include', 'login');
+    cy.contains('Email');
+    cy.contains('Password');
+  });
 });

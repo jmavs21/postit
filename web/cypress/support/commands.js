@@ -8,3 +8,14 @@ Cypress.Commands.add('login', () => {
     },
   });
 });
+
+Cypress.Commands.add('loginAsOther', () => {
+  cy.visit('/', {
+    onBeforeLoad(window) {
+      window.localStorage.setItem(
+        'token',
+        'eyJhbGciOiJIUzI1NiJ9.eyJpZCI6NSwibmFtZSI6Ik11aXJlIiwiZW1haWwiOiJtZWxpczRAdWNzZC5lZHUiLCJzdWIiOiJtZWxpczRAdWNzZC5lZHUiLCJpYXQiOjE2MTQ4OTM2NjgsImV4cCI6MTkzMDI5MzY2OH0.ZbwdLPd90xkn2VNZ8ZZV4SUP1OCmflpe4ei455KG4vg'
+      );
+    },
+  });
+});

@@ -48,4 +48,28 @@ describe('offline mode', { browser: '!firefox' }, () => {
     cy.get('a[href="/posts/38"]').click();
     cy.get('div[role="progressbar"]').should('exist');
   });
+
+  it('shows error message when trying to load posts', () => {
+    cy.visit('/');
+    goOffline();
+    cy.contains('h2', 'POSTS').click();
+    cy.contains('Please try again later');
+  });
+
+  it('can write new post', () => {
+    cy.login();
+    goOffline();
+    cy.get('a[href="/posts/new"]').click();
+    cy.url().should('include', 'new');
+    cy.contains('Title');
+    cy.contains('Text');
+  });
+
+  it('can view some information from profile', () => {
+    cy.login();
+    goOffline();
+    cy.contains('Bob').click();
+    cy.url().should('include', 'profile');
+    cy.get('div[role="progressbar"]').should('exist');
+  });
 });

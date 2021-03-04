@@ -1,5 +1,5 @@
 describe('login', () => {
-  it('logins', () => {
+  it('logins and then logouts', () => {
     cy.visit('/');
     cy.url().should('include', '/posts');
     cy.get('a[href="/login"]').click();

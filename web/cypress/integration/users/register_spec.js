@@ -45,7 +45,7 @@ describe('registration', () => {
     cy.url().should('include', 'register');
   });
 
-  it('does not register user with invalid character name', () => {
+  it('does not register user with invalid character for name', () => {
     cy.visit('/');
     cy.get('a[href="/register"]').click();
     cy.get('#name').type('|');

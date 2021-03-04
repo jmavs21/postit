@@ -18,4 +18,13 @@ describe('profile', () => {
     cy.contains('button', 'Update').click();
     cy.contains('Bob');
   });
+
+  it('does not updates profile with invalid character for name', () => {
+    cy.login();
+    cy.contains('Bob').click();
+    cy.get('#name').clear().type('|');
+    cy.contains('button', 'Update').click();
+    cy.contains('only alphanumeric');
+    cy.url().should('include', 'profile');
+  });
 });
