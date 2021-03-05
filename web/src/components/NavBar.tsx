@@ -45,7 +45,7 @@ export const NavBar: React.FC = () => {
       align="center"
     >
       <Flex width={800} align="center">
-        <Flex mr={4}>
+        <Flex mr={2}>
           <NavLink to="/">
             <Heading size="lg">POSTS</Heading>
           </NavLink>
@@ -79,18 +79,20 @@ export const NavBar: React.FC = () => {
             )}
           </Formik>
         </Flex>
-        <Flex ml={4} align="center">
+        <Flex ml={2} align="center">
           <IconButton
             icon={colorMode === 'light' ? 'sun' : 'moon'}
             size="xs"
-            mr={2}
+            mr={4}
             isRound={true}
-            aria-label={`change to ${colorMode} mode`}
+            aria-label={`change to ${
+              colorMode === 'light' ? 'dark' : 'light'
+            } mode`}
             onClick={toggleColorMode}
           />
           {!user && (
             <>
-              <Text mr={2}>
+              <Text mr={4}>
                 <NavLink to="/login">Login</NavLink>
               </Text>
               <Text>

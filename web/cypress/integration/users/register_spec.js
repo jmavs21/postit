@@ -2,7 +2,7 @@ import Chance from 'chance';
 
 const chance = new Chance();
 
-describe('registration', () => {
+describe('register', () => {
   it('registers user, logins and logouts', () => {
     cy.visit('/');
     cy.url().should('include', '/posts');

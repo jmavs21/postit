@@ -10,15 +10,35 @@ describe('follows', () => {
   });
 
   it('is followed by another user', () => {
-    cy.loginAsOther();
-    cy.get('#searchText').type('Bob{enter}');
-    cy.contains('button', 'Follow').click().next().contains('Bob');
     cy.login();
-    cy.contains('Bob').click();
-    cy.url().should('include', 'profile');
-    cy.contains('Followers').next().contains('Muire');
-    cy.loginAsOther();
-    cy.get('#searchText').type('Bob{enter}');
-    cy.contains('button', 'Following').click().next().contains('Bob');
+    cy.request({
+      method: 'POST',
+      url: Cypress.env('apiUrl') + '/follows',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': Cypress.env('muireToken'),
+      },
+      body: { toId: 1 },
+    }).then((response) => {
+      expect(response.body).to.be.equal('Followed');
+      cy.contains('Bob').click();
+      cy.url().should('include', 'profile');
+      cy.contains('Followers').next().contains('Muire');
+      cy.request({
+        method: 'POST',
+        url: Cypress.env('apiUrl') + '/follows',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': Cypress.env('muireToken'),
+        },
+        body: { toId: 1 },
+      }).then((response) => {
+        expect(response.body).to.be.equal('Unfollowed');
+        cy.reload();
+        cy.url().should('include', 'profile');
+        cy.contains('Followers');
+        cy.get('a[href="/posts?search=Muire"]').should('not.exist');
+      });
+    });
   });
 });

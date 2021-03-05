@@ -1,4 +1,4 @@
-describe('home', () => {
+describe('go home', () => {
   it('goes to posts when clicking on home button', () => {
     cy.visit('/');
     cy.get('div[role="progressbar"]').should('exist');

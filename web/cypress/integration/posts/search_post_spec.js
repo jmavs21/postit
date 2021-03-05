@@ -1,11 +1,11 @@
-describe('search post', () => {
+describe('search posts', () => {
   it('searches posts by title', () => {
     cy.login();
     cy.get('#searchText').type('Distributed asymmetric{enter}');
     cy.contains('Distributed asymmetric structure');
   });
 
-  it('searches posts by text', () => {
+  it('searches post by text', () => {
     cy.login();
     cy.get('#searchText').type(
       'Praesent blandit. Nam nulla. Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede.{enter}'
@@ -13,7 +13,7 @@ describe('search post', () => {
     cy.contains('Distributed asymmetric structure');
   });
 
-  it('searches posts by user name', () => {
+  it('searches post by user name', () => {
     cy.login();
     cy.get('#searchText').type('Xever{enter}');
     cy.contains('Distributed asymmetric structure');
