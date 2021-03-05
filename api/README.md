@@ -1,6 +1,8 @@
-## API
+# API
 
-### Technologies used
+[Posts](https://github.com/jmavs21/posts) backend.
+
+## Technologies used
 
 - Kotlin
 - Spring Boot
@@ -14,34 +16,26 @@
 - Server-Sent Events
 - Swagger
 
-### Installation
+## Usage
 
-- Go into project
-
-```sh
-cd /api
-```
-
-- Build
+### Build
 
 ```sh
 ./gradlew build
 ```
 
-- Run
+### Run
 
 ```sh
 ./gradlew bootRun
 ```
 
+### Run integration tests
+
+```sh
+./gradlew test
+```
+
 ### API documentation
 
-- Via [Swagger](http://localhost:4000/swagger-ui.html#/)
-
-### Architecture
-
-- Multilayered architecture: each layer can only call their inner layers.
-  ![](cleanarchitecture.png)
-
-- Package by component: each domain has its own package component.
-  ![](packagebycomponent.png)
+Via [Swagger](http://localhost:4000/swagger-ui.html#/)

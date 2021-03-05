@@ -1,6 +1,8 @@
-## Web
+# Web
 
-### Technologies used
+[Posts](https://github.com/jmavs21/posts) frontend.
+
+## Technologies used
 
 - TypeScript
 - React
@@ -11,23 +13,28 @@
 - JWT decode
 - React Waypoint
 - Server-Sent Events API
+- Cypress
 
-### Installation
+## Usage
 
-- Go into project
-
-```sh
-cd /web
-```
-
-- Build
+### Build
 
 ```sh
 npm i
 ```
 
-- Run
+### Run
 
 ```sh
 npm start
 ```
+
+### Run E2E tests
+
+- Run first the backend API project by following the instructions in [here](https://github.com/jmavs21/posts/tree/master/api)
+
+```sh
+   npm run cypress:open
+```
+
+- On Cypress UI click button **Run integration specs**

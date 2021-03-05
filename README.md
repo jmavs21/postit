@@ -1,10 +1,8 @@
 # Posts
 
-A web application for posting messages.
+A scalable web application for posting messages.
 
-- Link to [demo](https://limitless-refuge-35645.herokuapp.com/posts)
-
-## Example
+- [Online demo](https://limitless-refuge-35645.herokuapp.com/posts)
 
 ![](example.gif)
 
@@ -16,29 +14,34 @@ A web application for posting messages.
 - Search posts
 - Voting on posts
 - Follow users
-- Pagination
 - Feed notification via Server-Sent Events
+- Pagination
 - Light and dark modes
+- Test coverage
 
 ## Technologies used
 
-### Web
+### Web (Frontend)
 
 - TypeScript
 - React
 
-### Api
+### Api (Backend)
 
 - Kotlin
 - Spring Boot
 
-## Installation
+## Usage
 
 - Clone repo
 
 ```sh
-git clone https://github.com/jmavs21/posts.git
+   git clone https://github.com/jmavs21/posts.git
 ```
 
 - Continue for [Web](https://github.com/jmavs21/posts/tree/master/web)
 - Continue for [Api](https://github.com/jmavs21/posts/tree/master/api)
+
+## License
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
