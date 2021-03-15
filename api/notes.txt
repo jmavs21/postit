@@ -1,1 +1,4 @@
 sprint initializr: spring web, spring data jpa, h2 database, spring boot devtools
+docker
+    docker build --tag=api:latest .
+    docker run -p8080:4000 api:latest
