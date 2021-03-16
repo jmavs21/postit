@@ -14,6 +14,7 @@
 - React Waypoint
 - Server-Sent Events API
 - Cypress
+- Docker
 
 ## Usage
 
@@ -38,3 +39,24 @@ npm start
 ```
 
 - On Cypress UI click button **Run integration specs**
+
+## Docker usage
+
+### Build
+
+```sh
+docker build -t web:latest .
+```
+
+### Run
+
+```sh
+docker run \
+      -it \
+      --rm \
+      -v {$PWD}:/app \
+      -v /app/node_modules \
+      -p 3000:3000 \
+      -e CHOKIDAR_USEPOLLING=true \
+      web:latest
+```

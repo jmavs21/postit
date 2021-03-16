@@ -15,6 +15,21 @@ npm i cypress --save-dev
 npm i eslint-plugin-cypress --save-dev
 npm i chance --save-dev
 
+cypress tests
+  npm i cypress --save-dev
+  npm run cypress:open
+
+docker
+  docker build -t web:latest .
+  docker run \
+      -it \
+      --rm \
+      -v {$PWD}:/app \
+      -v /app/node_modules \
+      -p 3000:3000 \
+      -e CHOKIDAR_USEPOLLING=true \
+      web:latest
+
 -- INDEX SETUP --
 index.tsx
   <BrowserRouter>

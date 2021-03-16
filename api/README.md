@@ -15,6 +15,7 @@
 - Java JWT
 - Server-Sent Events
 - Swagger
+- Docker
 
 ## Usage
 
@@ -39,3 +40,17 @@
 ### API documentation
 
 Via [Swagger](http://localhost:4000/swagger-ui.html#/)
+
+## Docker usage
+
+### Build
+
+```sh
+docker build -t api:latest .
+```
+
+### Run
+
+```sh
+docker run -p 4000:4000 api:latest
+```
