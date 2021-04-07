@@ -1,4 +1,4 @@
-# API
+# api
 
 [Posts](https://github.com/jmavs21/posts) backend.
 

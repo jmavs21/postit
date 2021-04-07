@@ -1,4 +1,4 @@
-# Web
+# web
 
 [Posts](https://github.com/jmavs21/posts) frontend.
 

@@ -21,12 +21,12 @@ A scalable web application for posting messages.
 
 ## Technologies used
 
-### Web (Frontend)
+### web (frontend)
 
 - TypeScript
 - React
 
-### Api (Backend)
+### api (backend)
 
 - Kotlin
 - Spring Boot
@@ -39,8 +39,8 @@ A scalable web application for posting messages.
    git clone https://github.com/jmavs21/posts.git
 ```
 
-- Continue for [Web](https://github.com/jmavs21/posts/tree/master/web)
-- Continue for [Api](https://github.com/jmavs21/posts/tree/master/api)
+- Continue for [web](https://github.com/jmavs21/posts/tree/master/web)
+- Continue for [api](https://github.com/jmavs21/posts/tree/master/api)
 
 ## License
 
