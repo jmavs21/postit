@@ -41,7 +41,8 @@ fun checkLongEqual(first: Long?, second: Long) {
 }
 
 fun checkJsons(json: String?, pathToOther: Map<String, String>) {
+  val parsed = JsonPath.parse(json)
   for ((path, other) in pathToOther) {
-    checkStringContains(JsonPath.parse(json).read<String>(path), other)
+    checkStringContains(parsed.read<String>(path), other)
   }
 }
