@@ -8,5 +8,5 @@ interface FeedSse {
 
   fun removeEmitter(userId: Long)
 
-  fun sendToEmitters(userName: String, skipUserId: Long)
+  fun sendToEmitters(userName: String, toUserId: Long)
 }

@@ -1,5 +1,6 @@
 package com.posts.api.web.sse
 
+import com.posts.api.follows.FollowService
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.stereotype.Service
@@ -8,7 +9,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Service
 @EnableAsync
-internal class FeedSseImpl(private val emitters: MutableMap<Long, SseEmitter> = ConcurrentHashMap()) :
+internal class FeedSseImpl(
+  private val emitters: MutableMap<Long, SseEmitter> = ConcurrentHashMap(),
+  private val followService: FollowService
+) :
   FeedSse {
 
   override fun addEmitter(userId: Long, emitter: SseEmitter) {
@@ -20,12 +24,12 @@ internal class FeedSseImpl(private val emitters: MutableMap<Long, SseEmitter> = 
   }
 
   @Async
-  override fun sendToEmitters(userName: String, skipUserId: Long) {
+  override fun sendToEmitters(userName: String, toUserId: Long) {
     val deadEmitters = mutableListOf<Long>()
+    val followers = followService.findFollowers(toUserId).map { it.from.id }.toSet()
     for ((userId, emitter) in emitters) {
       try {
-        if (userId == skipUserId) continue
-        emitter.send("New post from $userName")
+        if (userId in followers) emitter.send("New post from $userName")
       } catch (e: Exception) {
         deadEmitters.add(userId)
       }
